@@ -1,0 +1,11 @@
+; src\Main.asm
+IRQ                              = $C004
+Forever                          = $C000
+InitBank                         = $E045
+Main                             = $C000
+initBankTable                    = $E058
+RESET                            = $E000
+InitSprites                      = $E040
+NMI                              = $C003
+ClearMemory                      = $E021
+VblankWait1                      = $E01C
