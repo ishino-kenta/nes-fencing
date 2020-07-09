@@ -1,0 +1,5 @@
+変数 xxx_yyy_zzz
+ラベル XxxYyyZzz
+一時ラベル .xxx_yyy_zzz
+定数 XXX_YYY_ZZZ
+データのラベル xxxYyyZzz
