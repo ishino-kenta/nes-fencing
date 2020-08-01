@@ -12,9 +12,10 @@ OAM = $0200
 DIRECTION_LEFT = $01
 DIRECTION_RIGHT = $00
 
+
     .rsset $0000
-test .rs 2
-tmp .rs 4
+test .rs 10
+tmp .rs 5
 source_addr .rs 2
 
 draw_ready  .rs 1
@@ -42,9 +43,6 @@ player2_x_pre   .rs 2
 player2_screen_x    .rs 1
 
 
-
-
-
 ; main proces
     .bank 0
     .org $C000 
@@ -66,82 +64,13 @@ Main:
     bit $2002
     bpl .vw2
 
-    lda #$00
-    sta scroll_x
-    sta scroll_x+1
-    sta scroll_y
-    sta scroll_y+1
+    inline InitValue
 
-    lda #$50
-    sta player1_x
-    lda #$01
-    sta player1_x+1
+    jsr MoveScreen
 
-    lda #$A0
-    sta player2_x
-    lda #$01
-    sta player2_x+1
+    inline InitBG
 
-    lda #SWORD_UP
-    sta player1_sword_height
-
-
-
-    ; draw bg
-
-    lda #$01
-    sta tmp
-.loop:
-    ldx #$00
-    lda #$1E
-    sta DRAW_BUFFER, x
-    inx
-    lda #FLAG_INC32+FLAG_MODE_TILE_ROM
-    sta DRAW_BUFFER, x
-    inx
-    lda #$20
-    sta DRAW_BUFFER, x
-    inx
-    lda tmp
-    sta DRAW_BUFFER, x
-    inx
-
-    lda #$00
-    sta tmp+1
-    lda tmp
-    sec
-    sbc #$01
-    clc
-    adc #$20
-    asl a
-    rol tmp+1
-    asl a
-    rol tmp+1
-    asl a
-    rol tmp+1
-    asl a
-    rol tmp+1
-    asl a
-    rol tmp+1
-
-    clc
-    adc #LOW(tile1)
-    sta DRAW_BUFFER, x
-    inx
-    lda #HIGH(tile1)
-    adc tmp+1
-    sta DRAW_BUFFER, x
-    inx
-
-    lda #$00
-    sta DRAW_BUFFER, x
-    inx
-    jsr DrawBG
-    inc tmp
-    lda tmp
-    cmp #$20
-    bne .loop
-
+    ; horizontal mirroring
     lda #$01
     sta $A000
 
@@ -173,17 +102,38 @@ WatiNMI:
     sta ppu_counter
     sta oam_counter
 
-    inline MovePlayer
-    
-    inline MoveScreen
+    jsr DecDead
 
+    lda player1_dead
+    bne .1
+    jsr MovePlayer1
+    jsr BoundaryCheck1
+    jsr ChangeSwordHeight1
+    jsr Attack1
+.1:
+
+    lda player2_dead
+    bne .2
+    jsr MovePlayer2
+    jsr BoundaryCheck2
+    jsr ChangeSwordHeight2
+    jsr Attack2
+.2:
+
+    lda player1_dead
+    ora player2_dead
+    bne .3
+    jsr ComputeTip
+    jsr SwordCollision
+    jsr BoundaryCheck1
+    jsr BoundaryCheck2
+    jsr HitCheck
+.3:
+    jsr DissappearPlayer
+
+    jsr MoveScreen
     inline SetPlayerPosition
-
-    inline ChangeSwordHeight
-
-    jsr Attack
-    
-    inline SetSprite
+    jsr SetSprite
 
     ; switch base nametable
     lda soft2000
@@ -191,8 +141,21 @@ WatiNMI:
     ora nt_base
     sta soft2000
 
-    .include "./src/SetTile_inline.asm"
+    lda direction_scroll
 
+    inline SetBG
+
+    lda scroll_x
+    clc
+    adc #$F0
+    sta test+2
+    lda scroll_x+1
+    adc #$00
+    sta test+3
+    lda player2_x
+    sta test+4
+    lda player2_x+1
+    sta test+5
 
     jmp MainLoop
 
@@ -237,6 +200,15 @@ IRQ:
     .include "./src/DrawBG.asm"
     .include "./src/ReadPad.asm"
     .include "./src/Attack.asm"
+    .include "./src/SetSprite.asm"
+    .include "./src/SwordCollision.asm"
+    .include "./src/ComputeTip.asm"
+    .include "./src/HitCheck.asm"
+    .include "./src/BoundaryCheck.asm"
+    .include "./src/DeadPlayer.asm"
+    .include "./src/MovePlayer.asm"
+    .include "./src/ChangeSwordHeight.asm"
+    .include "./src/MoveScreen.asm"
 
 
     .bank 1
@@ -297,9 +269,8 @@ palette:
     .incbin "src/res/palette.pal"
 
 tile1:
-    .incbin "src/res/field2.tile"
-attr1:
-    .incbin "src/res/field.attr"
+    .incbin "src/res/field3_24.tile"
+    
 
 ; vectors
     .org $FFFA

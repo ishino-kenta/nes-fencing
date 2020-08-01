@@ -2,10 +2,10 @@ player1_sword_height    .rs 1
 player2_sword_height    .rs 1
 
 SWORD_UP = $00
-SWORD_MID = $08
-SWORD_LOW = $10
+SWORD_MID = $01
+SWORD_LOW = $02
 
-ChangeSwordHeight:
+ChangeSwordHeight1:
     ; player1
     lda pad1
     eor pad1_pre
@@ -40,6 +40,11 @@ ChangeSwordHeight:
     lda #SWORD_MID
     sta player1_sword_height
 .end_up1:
+
+    rts
+
+ChangeSwordHeight2:
+
     ; player2
     lda pad2
     eor pad2_pre
@@ -74,3 +79,5 @@ ChangeSwordHeight:
     lda #SWORD_MID
     sta player2_sword_height
 .end_up2:
+
+    rts
