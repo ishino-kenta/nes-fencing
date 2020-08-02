@@ -1,4 +1,4 @@
-SetTile:
+SetBG:
     ; first
     ldx ppu_counter
     lda #$1E

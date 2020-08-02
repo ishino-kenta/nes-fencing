@@ -42,6 +42,9 @@ player2_x   .rs 2
 player2_x_pre   .rs 2
 player2_screen_x    .rs 1
 
+player1_y   .rs 1
+player2_y   .rs 1
+
 
 ; main proces
     .bank 0
@@ -65,8 +68,6 @@ Main:
     bpl .vw2
 
     inline InitValue
-
-    jsr MoveScreen
 
     inline InitBG
 
@@ -145,17 +146,7 @@ WatiNMI:
 
     inline SetBG
 
-    lda scroll_x
-    clc
-    adc #$F0
-    sta test+2
-    lda scroll_x+1
-    adc #$00
-    sta test+3
-    lda player2_x
-    sta test+4
-    lda player2_x+1
-    sta test+5
+    jsr Sandbox
 
     jmp MainLoop
 
@@ -209,6 +200,7 @@ IRQ:
     .include "./src/MovePlayer.asm"
     .include "./src/ChangeSwordHeight.asm"
     .include "./src/MoveScreen.asm"
+    .include "./src/Sandbox.asm"
 
 
     .bank 1

@@ -16,10 +16,14 @@ BoundaryCheck1:
     bne .e
     lda scroll_x+1
     cmp player1_x+1
+    beq .eq1
     bcc .n
+    jmp .o1
+.eq1:
     lda scroll_x
     cmp player1_x
     bcc .n
+.o1:
     lda scroll_x
     sta player1_x
     lda scroll_x+1
@@ -35,11 +39,14 @@ BoundaryCheck1:
     
     lda player1_x+1
     cmp tmp+1
+    beq .eq2
     bcc .e
+    jmp .o2
+.eq2:
     lda player1_x
     cmp tmp
     bcc .e
-
+.o2:
     lda tmp
     sta player1_x
     lda tmp+1
@@ -58,18 +65,19 @@ BoundaryCheck2:
     sta player2_x
     sta player2_x+1
 .end2:
-    lda #$0A
-    sta test
-
     lda player_lead
     cmp #VACANT
     bne .e
     lda scroll_x+1
     cmp player2_x+1
+    beq .eq1
     bcc .n
+    jmp .o1
+.eq1:
     lda scroll_x
     cmp player2_x
     bcc .n
+.o1:
     lda scroll_x
     sta player2_x
     lda scroll_x+1
@@ -85,11 +93,14 @@ BoundaryCheck2:
     
     lda player2_x+1
     cmp tmp+1
+    beq .eq2
     bcc .e
+    jmp .o2
+.eq2:
     lda player2_x
     cmp tmp
     bcc .e
-
+.o2:
     lda tmp
     sta player2_x
     lda tmp+1

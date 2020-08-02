@@ -7,44 +7,31 @@ SetSprite:
     ; set sprite data
     ; player1
     ldx oam_counter
-    lda #$8F
+
+    ldy #$00
+.l1:
+    lda player1_y
+    sec
+    sbc spriteTable1, y
     sta OAM, x
     inx
-    lda #$01
+    iny
+
+    lda spriteTable1, y
     sta OAM, x
     inx
+    iny
+
     lda #$00
     sta OAM, x
     inx
+
     lda player1_screen_x
     sta OAM, x
     inx
 
-    lda #$97
-    sta OAM, x
-    inx
-    lda #$02
-    sta OAM, x
-    inx
-    lda #$00
-    sta OAM, x
-    inx
-    lda player1_screen_x
-    sta OAM, x
-    inx
-
-    lda #$9F
-    sta OAM, x
-    inx
-    lda #$03
-    sta OAM, x
-    inx
-    lda #$00
-    sta OAM, x
-    inx
-    lda player1_screen_x
-    sta OAM, x
-    inx
+    cpy #$06
+    bne .l1
 
     ; sword
     lda player1_direction
@@ -77,11 +64,11 @@ SetSprite:
     lda [source_addr], y
     sta tmp ; attack offset sword x
 
-    lda #LOW(spriteTable1)
+    lda #LOW(spriteSwordTable1)
     clc
     adc tmp+1
     sta source_addr
-    lda #HIGH(spriteTable1)
+    lda #HIGH(spriteSwordTable1)
     adc #$00
     sta source_addr+1
     ldy #$00
@@ -95,6 +82,8 @@ SetSprite:
     asl a
     clc
     adc [source_addr], y
+    clc
+    adc player1_y
     sta OAM, x
     inx
     iny
@@ -123,42 +112,30 @@ SetSprite:
     bne .loop1
 
     ; player2
-    lda #$8F
+    ldy #$00
+.l2:
+    lda player2_y
+    sec
+    sbc spriteTable2, y
     sta OAM, x
     inx
+    iny
+
+    lda spriteTable2, y
+    sta OAM, x
+    inx
+    iny
+
     lda #$01
     sta OAM, x
     inx
-    lda #$01
-    sta OAM, x
-    inx
+
     lda player2_screen_x
     sta OAM, x
     inx
-    lda #$97
-    sta OAM, x
-    inx
-    lda #$02
-    sta OAM, x
-    inx
-    lda #$01
-    sta OAM, x
-    inx
-    lda player2_screen_x
-    sta OAM, x
-    inx
-    lda #$9F
-    sta OAM, x
-    inx
-    lda #$03
-    sta OAM, x
-    inx
-    lda #$01
-    sta OAM, x
-    inx
-    lda player2_screen_x
-    sta OAM, x
-    inx
+
+    cpy #$06
+    bne .l2
 
     ; sword
     lda player2_direction
@@ -191,11 +168,11 @@ SetSprite:
     lda [source_addr], y
     sta tmp
 
-    lda #LOW(spriteTable2)
+    lda #LOW(spriteSwordTable2)
     clc
     adc tmp+1
     sta source_addr
-    lda #HIGH(spriteTable2)
+    lda #HIGH(spriteSwordTable2)
     adc #$00
     sta source_addr+1
     ldy #$00
@@ -209,6 +186,8 @@ SetSprite:
     asl a
     clc
     adc [source_addr], y
+    clc
+    adc player2_y
     sta OAM, x
     inx
     iny
@@ -241,10 +220,15 @@ SetSprite:
 
     rts
 
-spriteTable1:
+spriteSwordTable1:
 ;   .db offset_y, sprite_number, attribute, offset_x
-    .db $8F,$04,$00,$08, $8F,$05,$00,$10, $8F,$05,$00,$18
-    .db $8F,$04,$40,$F8, $8F,$05,$40,$F0, $8F,$05,$40,$E8
+    .db $E8,$04,$00,$08, $E8,$05,$00,$10, $E8,$05,$00,$18 ; right
+    .db $E8,$04,$40,$F8, $E8,$05,$40,$F0, $E8,$05,$40,$E8 ; left
+spriteSwordTable2:
+    .db $E8,$04,$01,$08, $E8,$05,$01,$10, $E8,$05,$01,$18 ; right
+    .db $E8,$04,$41,$F8, $E8,$05,$41,$F0, $E8,$05,$41,$E8 ; left
+
+spriteTable1:
+    .db $18,$01, $10,$02, $08,$03
 spriteTable2:
-    .db $8F,$04,$01,$08, $8F,$05,$01,$10, $8F,$05,$01,$18
-    .db $8F,$04,$41,$F8, $8F,$05,$41,$F0, $8F,$05,$41,$E8
+    .db $18,$01, $10,$02, $08,$03

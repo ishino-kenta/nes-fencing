@@ -4,10 +4,10 @@ speed   .rs 1
 MovePlayer1:
 
     ; test code ---
-    lda #$02
+    lda #$01
     sta speed
     lda pad1
-    and #PAD_B
+    and #PAD_SELECT
     beq .aaa
     lda #$04
     sta speed
@@ -24,15 +24,15 @@ MovePlayer1:
     lda player1_x+1
     sta player1_x_pre+1
     
-    ; lda pad1
-    ; and #PAD_RIGHT
-    ; beq .end_right1
-    ; test code======
     lda pad1
-    eor pad1_pre
-    and pad1
     and #PAD_RIGHT
     beq .end_right1
+    ; test code======
+    ; lda pad1
+    ; eor pad1_pre
+    ; and pad1
+    ; and #PAD_RIGHT
+    ; beq .end_right1
     ;================
     lda player1_x
     clc
@@ -42,15 +42,15 @@ MovePlayer1:
     adc #$00
     sta player1_x+1
 .end_right1:
-    ; lda pad1
-    ; and #PAD_LEFT
-    ; beq .end_left1
-    ; test code======
     lda pad1
-    eor pad1_pre
-    and pad1
     and #PAD_LEFT
     beq .end_left1
+    ; test code======
+    ; lda pad1
+    ; eor pad1_pre
+    ; and pad1
+    ; and #PAD_LEFT
+    ; beq .end_left1
     ;================
     lda player1_x
     sec
@@ -75,7 +75,7 @@ MovePlayer2:
     sta player2_x_pre
     lda player2_x+1
     sta player2_x_pre+1
-    
+
     lda pad2
     and #PAD_RIGHT
     beq .end_right2
@@ -92,6 +92,7 @@ MovePlayer2:
     lda pad2
     and #PAD_LEFT
     beq .end_left2
+
     lda player2_x
     sec
     sbc speed

@@ -101,20 +101,28 @@ MoveScreen:
 
     lda #CAMERA_MOVEMENT_RIGHT_HIGH
     cmp tmp+1
+    beq .n1
     bcc .a
+    jmp .o1
+.n1:
     lda #CAMERA_MOVEMENT_RIGHT_LOW
     cmp tmp
     bcc .a
+.o1:
     ; x <= $0004
     jmp .d
 .a:
 
     lda #$7F
     cmp tmp+1
+    beq .n2
     bcc .b
+    jmp .o2
+.n2:
     lda #$FF
     cmp tmp
     bcc .b
+.o2:
     ; $0004 < x <= $7FFF
     lda #CAMERA_MOVEMENT_RIGHT_LOW
     sta tmp
@@ -125,10 +133,14 @@ MoveScreen:
 
     lda #CAMERA_MOVEMENT_LEFT_HIGH
     cmp tmp+1
+    beq .n3
     bcc .c
+    jmp .o3
+.n3:
     lda #CAMERA_MOVEMENT_LEFT_LOW
     cmp tmp
     bcc .c
+.o3:
     ; $7FFF < x <= $FFFC
     lda #CAMERA_MOVEMENT_LEFT_LOW
     sta tmp

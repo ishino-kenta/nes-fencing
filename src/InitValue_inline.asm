@@ -36,7 +36,6 @@ InitValue:
     sta player2_x
     lda #$04
     sta player2_x+1
-    ; need to be adjusted according to a
 
     lda player1_x
     clc
@@ -58,3 +57,6 @@ InitValue:
     lda tmp+1
     sbc #$00
     sta scroll_x+1
+
+    lda #$50
+    sta player1_y
