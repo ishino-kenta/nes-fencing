@@ -86,4 +86,4 @@ SetPlayerPosition:
     sta player1_direction
 .8:
 .e:
-    
+    rts

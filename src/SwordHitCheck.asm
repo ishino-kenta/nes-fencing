@@ -1,4 +1,7 @@
-HitCheck:
+HURT_RIGHT = $05
+HURT_LEFT = $02
+
+SwordHitCheck:
 
     ; change hit area depending on the direction
     lda player1_x+1
@@ -15,7 +18,7 @@ HitCheck:
     ; player1
     lda player2_x
     clc
-    adc #$03
+    adc #HURT_LEFT
     sta tmp
     lda player2_x+1
     adc #$00
@@ -32,11 +35,26 @@ HitCheck:
     bcc .next1
     jmp .end1
 .next1:
+
     lda player1_grip_x+1
     cmp tmp+1
-    bcc .do1
+    beq .eq12
+    bcc .next12
+    jmp .end1
+.eq12:
     lda player1_grip_x
     cmp tmp
+    bcc .next12
+    jmp .end1
+.next12:
+
+    lda player2_y_top
+    cmp player1_sword_y
+    bcc .next13
+    jmp .end1
+.next13:
+    lda player1_sword_y
+    cmp player2_y
     bcc .do1
     jmp .end1
 .do1:
@@ -47,7 +65,7 @@ HitCheck:
 
     lda player1_x
     clc
-    adc #$04
+    adc #HURT_RIGHT
     sta tmp
     lda player1_x+1
     adc #$00
@@ -67,9 +85,23 @@ HitCheck:
 
     lda tmp+1
     cmp player2_grip_x+1
-    bcc .do2
+    beq .eq22
+    bcc .next22
+    jmp .end2
+.eq22:
     lda tmp
     cmp player2_grip_x
+    bcc .next22
+    jmp .end2
+.next22:
+
+    lda player1_y_top
+    cmp player2_sword_y
+    bcc .next23
+    jmp .end2
+.next23:
+    lda player2_sword_y
+    cmp player1_y
     bcc .do2
     jmp .end2
 .do2:
@@ -85,7 +117,7 @@ HitCheck:
     ; player1
     lda player2_x
     clc
-    adc #$04
+    adc #HURT_RIGHT
     sta tmp
     lda player2_x+1
     adc #$00
@@ -104,9 +136,23 @@ HitCheck:
 .next3:
     lda tmp+1
     cmp player1_grip_x+1
-    bcc .do3
+    beq .eq32
+    bcc .next32
+    jmp .end3
+.eq32:
     lda tmp
     cmp player1_grip_x
+    bcc .next32
+    jmp .end3
+.next32:
+
+    lda player2_y_top
+    cmp player1_sword_y
+    bcc .next33
+    jmp .end3
+.next33:
+    lda player1_sword_y
+    cmp player2_y
     bcc .do3
     jmp .end3
 .do3:
@@ -116,7 +162,7 @@ HitCheck:
     ; player2
     lda player1_x
     clc
-    adc #$03
+    adc #HURT_LEFT
     sta tmp
     lda player1_x+1
     adc #$00
@@ -133,20 +179,32 @@ HitCheck:
     bcc .next4
     jmp .end4
 .next4:
+
     lda player2_grip_x+1
     cmp tmp+1
-    bcc .do4
+    beq .eq42
+    bcc .next42
+    jmp .end4
+.eq42:
     lda player2_grip_x
     cmp tmp
+    bcc .next42
+    jmp .end4
+.next42:
+
+    lda player1_y_top
+    cmp player2_sword_y
+    bcc .next43
+    jmp .end4
+.next43:
+    lda player2_sword_y
+    cmp player1_y
     bcc .do4
     jmp .end4
 .do4:
     jsr DeadPlayer1
-
 .end4:
 
 .end:
-
-
 
     rts

@@ -5,7 +5,7 @@ SetBG:
     sta DRAW_BUFFER, x ; lenght
     inx
     
-    lda #FLAG_INC32+FLAG_MODE_TILE_ROM
+    lda #FLAG_INC32+FLAG_DATA_ROM
     sta DRAW_BUFFER, x ; flag
     inx
     
@@ -81,7 +81,7 @@ SetBG:
     sta DRAW_BUFFER, x ; lenght
     inx
     
-    lda #FLAG_INC32+FLAG_MODE_TILE_ROM
+    lda #FLAG_INC32+FLAG_DATA_ROM
     sta DRAW_BUFFER, x ; flag
     inx
     

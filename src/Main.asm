@@ -1,7 +1,7 @@
 ; ines header
-    .inesprg 1  ; 1x 16KB PRG code
+    .inesprg 4  ; 1x 16KB PRG code
     .ineschr 1  ; 1x  8KB CHR data
-    .inesmap 4 
+    .inesmap 4
     .inesmir 1
 
 inline .macro
@@ -13,10 +13,11 @@ DIRECTION_LEFT = $01
 DIRECTION_RIGHT = $00
 
 
+
     .rsset $0000
 test .rs 10
-tmp .rs 5
-source_addr .rs 2
+tmp .rs 7
+source_addr .rs 4
 
 draw_ready  .rs 1
 wait_nmi    .rs 1
@@ -45,10 +46,44 @@ player2_screen_x    .rs 1
 player1_y   .rs 1
 player2_y   .rs 1
 
+field_limit_low    .rs 2
+field_limit_high    .rs 2
 
-; main proces
-    .bank 0
-    .org $C000 
+player1_sword_off   .rs 1
+player2_sword_off   .rs 1
+
+game_scene  .rs 2
+
+
+     .bank 0
+     .org $8000
+tile3:
+    .incbin "src/res/field4_24.tile"
+     .bank 1
+     .org $A000
+tile1:
+    .incbin "src/res/field3_24.tile"
+
+    .bank 2
+    .org $8000
+
+    .bank 3
+    .org $A000
+title:
+    .incbin "src/res/title.tile"
+stage:
+    .incbin "src/res/stage.tile"
+win:
+    .incbin "src/res/win.tile"
+
+    .bank 4
+    .org $8000
+
+    .bank 5
+    .org $A000
+
+    .bank 6
+    .org $C000
 
 Main:
 
@@ -67,9 +102,9 @@ Main:
     bit $2002
     bpl .vw2
 
-    inline InitValue
+    jsr InitSceneTitle
 
-    inline InitBG
+    jsr ReloadBG
 
     ; horizontal mirroring
     lda #$01
@@ -94,47 +129,96 @@ WatiNMI:
     lda wait_nmi
     bne .loop
 
-    ; =main logic=
+    lda #$00
+    sta ppu_counter
+    sta oam_counter
 
     jsr ReadPad1
     jsr ReadPad2
 
-    lda #$00
-    sta ppu_counter
-    sta oam_counter
+    jmp [game_scene]
+
+SceneBattle:
 
     jsr DecDead
 
     lda player1_dead
     bne .1
     jsr MovePlayer1
-    jsr BoundaryCheck1
+    jsr PlayerBoundaryCheck1
     jsr ChangeSwordHeight1
     jsr Attack1
+    jsr Jump1
+    jsr Fall1
+    jsr ComputePlayerTop
+    jsr Sandbox
+    lda #CHECK_BOTTOM
+    sta tmp+6
+    lda #PLAYER1
+    jsr CheckHit
+    lda #CHECK_TOP
+    sta tmp+6
+    lda #PLAYER1
+    jsr CheckHit
+    jsr Crouch1
 .1:
 
     lda player2_dead
     bne .2
     jsr MovePlayer2
-    jsr BoundaryCheck2
+    jsr PlayerBoundaryCheck2
     jsr ChangeSwordHeight2
     jsr Attack2
+    jsr Jump2
+    jsr Fall2
+    jsr ComputePlayerTop
+    lda #CHECK_BOTTOM
+    sta tmp+6
+    lda #PLAYER2
+    jsr CheckHit
+    lda #CHECK_TOP
+    sta tmp+6
+    lda #PLAYER2
+    jsr CheckHit
+    jsr Crouch2
 .2:
+
+    jsr ComputeSwordY
+    jsr ComputePlayerTop
 
     lda player1_dead
     ora player2_dead
     bne .3
     jsr ComputeTip
+    lda player1_crouch
+    cmp #CROUCH
+    beq .off
+    lda player1_fall_index
+    bne .off
+    lda player1_speed
+    cmp #RUN
+    bcs .off
+    lda player2_crouch
+    cmp #CROUCH
+    beq .off
+    lda player2_fall_index
+    bne .off
+    lda player2_speed
+    cmp #RUN
+    bcs .off
     jsr SwordCollision
-    jsr BoundaryCheck1
-    jsr BoundaryCheck2
-    jsr HitCheck
+    jsr PlayerBoundaryCheck1
+    jsr PlayerBoundaryCheck2
+.off:
+    
+    jsr SwordHitCheck
 .3:
+
     jsr DissappearPlayer
 
     jsr MoveScreen
-    inline SetPlayerPosition
-    jsr SetSprite
+    jsr SetPlayerPosition
+    jsr SetPlayer
 
     ; switch base nametable
     lda soft2000
@@ -142,68 +226,162 @@ WatiNMI:
     ora nt_base
     sta soft2000
 
-    lda direction_scroll
-
     inline SetBG
+
+    jsr ChangeField
+    jsr PlayerWin
 
     jsr Sandbox
 
     jmp MainLoop
 
-NMI:
 
-    lda do_draw
-    beq .not_draw
-    jsr DrawBG
-    lda #$00
-    sta do_draw
-.not_draw:
 
-    lda do_dma
-    beq .not_dma
-    lda #$00
-    sta $2003
-    lda #HIGH(OAM)
-    sta $4014
-.not_dma:
 
-    bit $20
-    lda scroll_x
-    sta $2005
-    lda scroll_y
-    sta $2005
+SceneTitle:
+
+    lda pad1
+    eor pad1_pre
+    and pad1
+    and #PAD_START
+    beq .1
+
+    jsr InitSceneStage
+
+    lda #LOW(SceneStage)
+    sta game_scene
+    lda #HIGH(SceneStage)
+    sta game_scene+1
 
     lda soft2000
+    and #$7F
+    sta soft2000
     sta $2000
     lda soft2001
+    and #$E7
+    sta soft2001
     sta $2001
 
+    jsr ReloadBG
+
+    lda soft2000
+    ora #$80
+    sta soft2000
+    sta $2000
+    lda soft2001
+    ora #$18
+    sta soft2001
+
+.1:
+
+    jmp MainLoop
+
+
+
+
+SceneStage:
+
+    jsr SelectStage
+
+    jsr SetCursor
+
+    jmp MainLoop
+
+
+
+
+SceneResult:
+
+    jsr SetPlayer
+
+    lda player_lead
+    cmp #PLAYER1
+    bne .not1
+    inc player1_screen_x
+    inc player1_screen_x
+    inc player1_screen_x
+.not1:
+    lda player_lead
+    cmp #PLAYER2
+    bne .not2
+    dec player2_screen_x
+    dec player2_screen_x
+    dec player2_screen_x
+.not2:
+
+    lda pad1
+    eor pad1_pre
+    and pad1
+    and #PAD_START
+    beq .1
+
+    jsr InitSceneStage
+
+    lda soft2000
+    and #$7F
+    sta soft2000
+    sta $2000
+    lda soft2001
+    and #$E7
+    sta soft2001
+    sta $2001
+
+    jsr ReloadBG
+
+    ldx #$00
+.l:
     lda #$00
-    sta wait_nmi
+    sta OAM, x
+    inx
+    cpx #$28
+    bne .l
 
-    rti
+    lda soft2000
+    ora #$80
+    sta soft2000
+    sta $2000
+    lda soft2001
+    ora #$18
+    sta soft2001
 
-IRQ:
+    lda #LOW(SceneStage)
+    sta game_scene
+    lda #HIGH(SceneStage)
+    sta game_scene+1
 
-    rti
+.1:
 
-    .include "./src/LoadPalette.asm"
-    .include "./src/DrawBG.asm"
-    .include "./src/ReadPad.asm"
-    .include "./src/Attack.asm"
-    .include "./src/SetSprite.asm"
-    .include "./src/SwordCollision.asm"
-    .include "./src/ComputeTip.asm"
-    .include "./src/HitCheck.asm"
-    .include "./src/BoundaryCheck.asm"
+    jmp MainLoop
+
+
+
+    .include "./src/NMI.asm"    
+    .include "./src/IRQ.asm"
+
+
     .include "./src/DeadPlayer.asm"
     .include "./src/MovePlayer.asm"
     .include "./src/ChangeSwordHeight.asm"
     .include "./src/MoveScreen.asm"
     .include "./src/Sandbox.asm"
+    .include "./src/Fall.asm"
+    .include "./src/Jump.asm"
+    .include "./src/Crouch.asm"
+    .include "./src/ComputeSwordY.asm"
+    .include "./src/ComputePlayerTop.asm"
+    .include "./src/ReloadBG.asm"
+    .include "./src/ChangeField.asm"
+    .include "./src/InitSceneBattle.asm"
+    .include "./src/InitSceneStage.asm"
+    .include "./src/InitSceneTitle.asm"
+    .include "./src/SelectStage.asm"
+    .include "./src/SetCursor.asm"
+    .include "./src/SetPlayerPosition.asm"
+    .include "./src/PlayerWin.asm"
+;    .include "./src/WallHit.asm"
 
 
-    .bank 1
+    .bank 7
     .org $E000
 RESET:
     sei         ; disanle IRQs
@@ -220,9 +398,9 @@ RESET:
     sta $A000   ; nametable mirroring
     sta $4015   ; sound register iniitialize
 
-VblankWait1:
+.vw:
     bit $2002
-    bpl VblankWait1
+    bpl .vw
 
 ClearMemory:
     lda #$00
@@ -255,14 +433,22 @@ InitBank:
     jmp Main
 
 initBankTable:
-    .db $00,$02,$04,$05,$06,$07,$00,$00
+    .db $00,$02,$04,$05,$06,$07,$00,$01
 
 palette:
     .incbin "src/res/palette.pal"
 
-tile1:
-    .incbin "src/res/field3_24.tile"
-    
+    .include "./src/LoadPalette.asm"
+    .include "./src/DrawBG.asm"
+    .include "./src/ReadPad.asm"
+    .include "./src/Attack.asm"
+    .include "./src/SetPlayer.asm"
+    .include "./src/SwordCollision.asm"
+    .include "./src/ComputeTip.asm"
+    .include "./src/SwordHitCheck.asm"
+    .include "./src/PlayerBoundaryCheck.asm"
+    .include "./src/CheckHit.asm"
+
 
 ; vectors
     .org $FFFA
@@ -272,6 +458,6 @@ tile1:
 
 
 ; Character datas
-    .bank 2
+    .bank 8
     .org $0000
     .incbin "./src/res/chr.chr"

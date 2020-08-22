@@ -2,8 +2,8 @@ player1_sword_height    .rs 1
 player2_sword_height    .rs 1
 
 SWORD_UP = $00
-SWORD_MID = $01
-SWORD_LOW = $02
+SWORD_MID = $06
+SWORD_LOW = $0C
 
 ChangeSwordHeight1:
     ; player1

@@ -3,24 +3,79 @@ ATTACK_TABLE2 = $28
 SPRITE_TABLE1 = $00
 SPRITE_TABLE2 = $0C
 
-SetSprite:
+SetPlayer:
     ; set sprite data
     ; player1
     ldx oam_counter
 
-    ldy #$00
-.l1:
+    lda player1_y_top
+    sec
+    sbc #$01
+    sta OAM, x
+    inx
+
+    lda #$01
+    sta OAM, x
+    inx
+
+    lda #$00
+    sta OAM, x
+    inx
+
+    lda player1_screen_x
+    sta OAM, x
+    inx
+    
+    ;
+    lda player1_crouch
+    cmp #CROUCH
+    beq .crouch1
+
     lda player1_y
     sec
-    sbc spriteTable1, y
+    sbc #$10
     sta OAM, x
     inx
-    iny
 
-    lda spriteTable1, y
+    lda #$02
     sta OAM, x
     inx
-    iny
+
+    lda #$00
+    sta OAM, x
+    inx
+
+    lda player1_screen_x
+    sta OAM, x
+    inx
+    jmp .end1
+.crouch1:
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+.end1:
+    ;
+    lda player1_y
+    sec
+    sbc #$08
+    sta OAM, x
+    inx
+
+    lda #03
+    sta OAM, x
+    inx
 
     lda #$00
     sta OAM, x
@@ -30,10 +85,29 @@ SetSprite:
     sta OAM, x
     inx
 
-    cpy #$06
-    bne .l1
 
     ; sword
+
+    lda player1_crouch
+    cmp #CROUCH
+    beq .off1
+    lda player1_fall_index
+    bne .off1
+    lda player1_speed
+    cmp #RUN
+    bcs .off1
+    jmp .on1
+.off1:
+    ldy #$00
+.loop12:
+    lda #$FE
+    sta OAM, x
+    inx
+    iny
+    cpy #$08
+    bne .loop12
+    jmp .end12
+.on1:
     lda player1_direction
     cmp #DIRECTION_RIGHT
     bne .3
@@ -58,7 +132,7 @@ SetSprite:
     lda #HIGH(attackTable)
     adc #$00
     sta source_addr+1
-    lda player1_atttack_counter
+    lda player1_atttack_index
     asl a
     tay
     lda [source_addr], y
@@ -77,9 +151,6 @@ SetSprite:
     sta tmp+1
 .loop1:
     lda player1_sword_height
-    asl a
-    asl a
-    asl a
     clc
     adc [source_addr], y
     clc
@@ -108,23 +179,80 @@ SetSprite:
 
     inc tmp+1
     lda tmp+1
-    cmp #$03
+    cmp #$02
     bne .loop1
 
+.end12:
+
     ; player2
-    ldy #$00
-.l2:
+    ;
+    lda player2_y_top
+    sec
+    sbc #$01
+    sta OAM, x
+    inx
+
+    lda #$01
+    sta OAM, x
+    inx
+
+    lda #$01
+    sta OAM, x
+    inx
+
+    lda player2_screen_x
+    sta OAM, x
+    inx
+    ;
+
+    lda player2_crouch
+    cmp #CROUCH
+    beq .crouch2
     lda player2_y
     sec
-    sbc spriteTable2, y
+    sbc #$10
     sta OAM, x
     inx
-    iny
 
-    lda spriteTable2, y
+    lda #$02
     sta OAM, x
     inx
-    iny
+
+    lda #$01
+    sta OAM, x
+    inx
+
+    lda player2_screen_x
+    sta OAM, x
+    inx
+    jmp .end2
+.crouch2:
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+
+    lda #$FE
+    sta OAM, x
+    inx
+.end2:
+    ;
+    lda player2_y
+    sec
+    sbc #$08
+    sta OAM, x
+    inx
+
+    lda #$03
+    sta OAM, x
+    inx
 
     lda #$01
     sta OAM, x
@@ -134,10 +262,28 @@ SetSprite:
     sta OAM, x
     inx
 
-    cpy #$06
-    bne .l2
-
     ; sword
+
+    lda player2_crouch
+    cmp #CROUCH
+    beq .off2
+    lda player2_fall_index
+    bne .off2
+    lda player2_speed
+    cmp #RUN
+    bcs .off2
+    jmp .on2
+.off2:
+    ldy #$00
+.loop22:
+    lda #$FE
+    sta OAM, x
+    inx
+    iny
+    cpy #$08
+    bne .loop22
+    jmp .end22
+.on2:
     lda player2_direction
     cmp #DIRECTION_RIGHT
     bne .1
@@ -162,7 +308,7 @@ SetSprite:
     lda #HIGH(attackTable)
     adc #$00
     sta source_addr+1
-    lda player2_atttack_counter
+    lda player2_atttack_index
     asl a
     tay
     lda [source_addr], y
@@ -181,9 +327,6 @@ SetSprite:
     sta tmp+1
 .loop2:
     lda player2_sword_height
-    asl a
-    asl a
-    asl a
     clc
     adc [source_addr], y
     clc
@@ -213,8 +356,9 @@ SetSprite:
 
     inc tmp+1
     lda tmp+1
-    cmp #$03
+    cmp #$02
     bne .loop2
+.end22:
 
     stx oam_counter
 
@@ -222,13 +366,8 @@ SetSprite:
 
 spriteSwordTable1:
 ;   .db offset_y, sprite_number, attribute, offset_x
-    .db $E8,$04,$00,$08, $E8,$05,$00,$10, $E8,$05,$00,$18 ; right
-    .db $E8,$04,$40,$F8, $E8,$05,$40,$F0, $E8,$05,$40,$E8 ; left
+    .db $E6,$04,$00,$08, $E6,$05,$00,$10, $E6,$05,$00,$18 ; right
+    .db $E6,$04,$40,$F8, $E6,$05,$40,$F0, $E6,$05,$40,$E8 ; left
 spriteSwordTable2:
-    .db $E8,$04,$01,$08, $E8,$05,$01,$10, $E8,$05,$01,$18 ; right
-    .db $E8,$04,$41,$F8, $E8,$05,$41,$F0, $E8,$05,$41,$E8 ; left
-
-spriteTable1:
-    .db $18,$01, $10,$02, $08,$03
-spriteTable2:
-    .db $18,$01, $10,$02, $08,$03
+    .db $E6,$04,$01,$08, $E6,$05,$01,$10, $E6,$05,$01,$18 ; right
+    .db $E6,$04,$41,$F8, $E6,$05,$41,$F0, $E6,$05,$41,$E8 ; left

@@ -8,7 +8,9 @@ MoveScreen:
     sta scroll_x_pre
     lda scroll_x+1
     sta scroll_x_pre+1
-    ; compule screen scrolling from player position
+
+    ; compule screen position from player position
+    
     lda player_lead
     cmp #VACANT
     bne .i
@@ -87,8 +89,6 @@ MoveScreen:
     sta tmp
     sta tmp+1
 .e:
-    and #$01
-    sta nt_base
 
     ; limit camera movement
     lda tmp
@@ -150,7 +150,7 @@ MoveScreen:
 .c:
     ; $FFFC < x
 .d:
-    
+
     lda scroll_x_pre
     clc
     adc tmp
@@ -158,6 +158,68 @@ MoveScreen:
     lda scroll_x_pre+1
     adc tmp+1
     sta scroll_x+1
+
+    ; field limit
+
+    ;high
+
+    lda field_limit_high+1
+    sta tmp+1
+    lda field_limit_high
+    sta tmp
+    lda tmp
+    sec
+    sbc #$F8
+    sta tmp
+    lda tmp+1
+    sbc #$00
+    sta tmp+1
+
+    lda tmp+1
+    cmp scroll_x+1
+    beq .eq1
+    bcc .bnd1
+    jmp .endb1
+.eq1:
+    lda tmp
+    cmp scroll_x
+    bcc .bnd1
+    jmp .endb1
+.bnd1:
+    lda tmp+1
+    sta scroll_x+1
+    lda tmp
+    sta scroll_x
+.endb1:
+
+    ;low
+
+    lda field_limit_low+1
+    sta tmp+1
+    lda field_limit_low
+    sta tmp
+
+    lda scroll_x+1
+    cmp tmp+1
+    beq .eq2
+    bcc .bnd2
+    jmp .endb2
+.eq2:
+    lda scroll_x
+    cmp tmp
+    bcc .bnd2
+    jmp .endb2
+.bnd2:
+    lda tmp+1
+    sta scroll_x+1
+    lda tmp
+    sta scroll_x
+.endb2:
+
+
+    lda scroll_x+1
+    and #$01
+    sta nt_base
 
     ; compule screen scrolling direction
     lda scroll_x+1

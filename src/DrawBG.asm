@@ -4,25 +4,33 @@
 ;  0. length (0 is end of datas)
 ;  1. flag
 ;   0. inc 32 (don't use for atteribute)
-;   1-2. mode
-;    00. tile or attr row, data from DRAW_BUFFER 
-;    01. tile or attr row colmun, data from rom
-;    10. attr colmun, data from DRAW_BUFFER
-;    11. attr colmun(), data from rom
+;   1-2.
+;    00. data from DRAW_BUFFER
+;    01. data from rom
+;    10. one data
+;   3.
+;    1. attr colmun mode. address increases by 4. don't use "inc 32".
 ;  2. address($2000~$23BF) low bite
 ;  3. address high bite
 ;  4~. tile number (repeat for length)
 ;  4-5. (rom mode) rom address low-high
+;  4. (one data) tile number
 ;
 ; used register
 ; a,x,y
+;
+; ???? BUG ????
+; In situation that BG and sprite off. 
+; length $80, data from rom, PPU behaves strangely in this situation
+; length $40, data from rom, PPU behaves correctly in this situation
+
 
 DRAW_BUFFER = $0300
 FLAG_INC32 = $01
-FLAG_MODE_TILE_BUFF = $00
-FLAG_MODE_TILE_ROM = $02
-FLAG_MODE_ATTR_BUFF = $04
-FLAG_MODE_ATTR_ROM = $06
+FLAG_DATA_BUFF = $00
+FLAG_DATA_ROM = $02
+FLAG_DATA_ONE = $04
+FLAG_ATTR_COL = $08
 
 
 tmp_drawbg .rs 5
@@ -42,7 +50,7 @@ DrawBG:
     and #$01
     asl a
     asl a
-    ora #%10010000
+    ora soft2000
     sta $2000
     ; mode
     lda DRAW_BUFFER, x
@@ -150,10 +158,32 @@ DrawBG:
     cpy tmp_drawbg
     bne .loop4
     jmp .start
-    
+
+.tile_one:
+    lda DRAW_BUFFER, x
+    inx
+    sta $2006
+    lda DRAW_BUFFER, x
+    inx
+    sta $2006
+    ldy #$00
+.loop5:
+    lda DRAW_BUFFER, x
+    sta $2007
+    iny
+    cpy tmp_drawbg
+    bne .loop5
+    inx
+
+    jmp .start
+
+.attr_one:
+  
+    jmp .start
+
 .end:
     rts
 
 .pointer_table:
-    .dw .tile_buf, .tile_rom, .attr_buf, .attr_rom
+    .dw .tile_buf, .tile_rom, .tile_one, $0000, .attr_buf, .attr_rom, .attr_one, $0000
 

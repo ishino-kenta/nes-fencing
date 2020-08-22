@@ -7,6 +7,8 @@ player2_tip_x   .rs 2
 player2_grip_x   .rs 2
 
 ComputeTip:
+
+    ; Table setting
     lda player1_direction
     cmp #DIRECTION_RIGHT
     bne .1
@@ -35,7 +37,7 @@ ComputeTip:
     lda #HIGH(attackTable)
     adc #$00
     sta source_addr+1
-    lda player1_atttack_counter
+    lda player1_atttack_index
     asl a
     tay
     lda [source_addr], y
@@ -51,7 +53,7 @@ ComputeTip:
     lda #HIGH(attackTable)
     adc #$00
     sta source_addr+1
-    lda player2_atttack_counter
+    lda player2_atttack_index
     asl a
     tay
     lda [source_addr], y
@@ -69,6 +71,24 @@ ComputeTip:
     sta source_addr+1
 
     ; compute player1 tip position
+
+    lda player1_crouch
+    cmp #CROUCH
+    beq .off1
+    lda player1_fall_index
+    bne .off1
+    lda player1_speed
+    cmp #RUN
+    bcs .off1
+    jmp .on1
+.off1:
+    lda #$FF
+    sta player1_tip_x
+    sta player1_tip_x+1
+    sta player1_grip_x
+    sta player1_grip_x+1
+    jmp .end1
+.on1:
     lda player1_x
     clc
     adc tmp
@@ -94,8 +114,28 @@ ComputeTip:
     lda tmp+1
     adc [source_addr], y
     sta player1_grip_x+1
-    
+.end1:
+
     ; compute player2 tip position
+
+    lda player2_crouch
+    cmp #CROUCH
+    beq .off2
+    lda player2_fall_index
+    bne .off2
+    lda player2_speed
+    cmp #RUN
+    bcs .off2
+    jmp .on2
+.off2:
+    lda #$FF
+    sta player2_tip_x
+    sta player2_tip_x+1
+    sta player2_grip_x
+    sta player2_grip_x+1
+    jmp .end2
+.on2:
+
     lda player2_x
     clc
     adc tmp+2
@@ -121,9 +161,9 @@ ComputeTip:
     lda tmp+3
     adc [source_addr], y
     sta player2_grip_x+1
-
+.end2:
     rts
 
 tipTable:
-    .db $1F,$00, $0B,$00, $E8,$FF, $FC,$FF 
-    .db $E8,$FF, $FC,$FF, $1F,$00, $0B,$00
+    .db $17,$00, $0B,$00, $F0,$FF, $FC,$FF 
+    .db $F0,$FF, $FC,$FF, $17,$00, $0B,$00

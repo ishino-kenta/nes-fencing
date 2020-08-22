@@ -1,4 +1,4 @@
-BoundaryCheck1:
+PlayerBoundaryCheck1:
     ; boundary check
     lda player1_x+1
     cmp #$FF
@@ -52,9 +52,40 @@ BoundaryCheck1:
     lda tmp+1
     sta player1_x+1
 .e:
+
+    ; field limit
+;     lda field_limit_high+1
+;     sta tmp+1
+;     lda field_limit_high
+;     sta tmp
+;     lda tmp
+;     sec
+;     sbc #$08
+;     sta tmp
+;     lda tmp+1
+;     sbc #$00
+;     sta tmp+1
+;     lda tmp+1
+;     cmp player1_x+1
+;     beq .eq
+;     bcc .bnd
+;     jmp .endb
+; .eq:
+;     lda tmp
+;     cmp player1_x
+;     bcc .bnd
+;     jmp .endb
+; .bnd:
+;     lda tmp+1
+;     sta player1_x+1
+;     lda tmp
+;     sta player1_x
+; .endb:
+
+
     rts
 
-BoundaryCheck2:
+PlayerBoundaryCheck2:
     lda player2_x+1
     cmp #$FF
     bne .end2
@@ -106,5 +137,34 @@ BoundaryCheck2:
     lda tmp+1
     sta player2_x+1
 .e:
+
+    ; field limit
+;     lda field_limit_high+1
+;     sta tmp+1
+;     lda field_limit_high
+;     sta tmp
+;     lda tmp
+;     sec
+;     sbc #$08
+;     sta tmp
+;     lda tmp+1
+;     sbc #$00
+;     sta tmp+1
+;     lda tmp+1
+;     cmp player2_x+1
+;     beq .eq
+;     bcc .bnd
+;     jmp .endb
+; .eq:
+;     lda tmp
+;     cmp player2_x
+;     bcc .bnd
+;     jmp .endb
+; .bnd:
+;     lda tmp+1
+;     sta player2_x+1
+;     lda tmp
+;     sta player2_x
+; .endb:
 
     rts

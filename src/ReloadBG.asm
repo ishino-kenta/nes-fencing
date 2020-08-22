@@ -1,15 +1,14 @@
-; Don't use
-; 32 tiles in one row
-InitBG:
+ReloadBG:
     lda #$00
     sta tmp
 .loop:
     ldx #$00
-    lda #$1E
+
+    lda #$18
     sta DRAW_BUFFER, x ; lenght
     inx
 
-    lda #FLAG_INC32+FLAG_MODE_TILE_ROM
+    lda #FLAG_INC32+FLAG_DATA_ROM
     sta DRAW_BUFFER, x ; flag
     inx
 
@@ -32,41 +31,61 @@ InitBG:
     lda scroll_x
     sta tmp+1
     lda scroll_x+1
-    sta tmp+2 
+    sta tmp+2
 
+    ; scroll_x / 8 * 24
+    
     lda tmp+1
     and #$F8
     sta tmp+1
-    asl tmp+1
-    rol tmp+2
-    asl tmp+1
-    rol tmp+2
-
-    lda #$00
     sta tmp+3
-    lda tmp
-    rol a
-    rol tmp+3
-    rol a
-    rol tmp+3
-    rol a
-    rol tmp+3
-    rol a
-    rol tmp+3
-    rol a
-    rol tmp+3
+    lda tmp+2
+    sta tmp+4
+
+    asl tmp+1
+    rol tmp+2
+    lda tmp+1
     clc
-    adc tmp+1
+    adc tmp+3
     sta tmp+1
     lda tmp+2
-    adc tmp+3
+    adc tmp+4
     sta tmp+2
+
+    lda tmp
+    sta tmp+3
+    lda #$00
+    sta tmp+4
+    asl tmp+3
+    rol tmp+4
+    asl tmp+3
+    rol tmp+4
+    asl tmp+3
+    rol tmp+4
+    lda tmp+1
+    clc
+    adc tmp+3
+    sta tmp+1
+    lda tmp+2
+    adc tmp+4
+    sta tmp+2
+    asl tmp+3
+    rol tmp+4
+    lda tmp+1
+    clc
+    adc tmp+3
+    sta tmp+1
+    lda tmp+2
+    adc tmp+4
+    sta tmp+2
+
 
     lda tmp+1
     clc
     adc #LOW(tile1)
     sta DRAW_BUFFER, x ; data high
     inx
+
     lda tmp+2
     adc #HIGH(tile1)
     sta DRAW_BUFFER, x ; data low
@@ -83,3 +102,4 @@ InitBG:
     beq .end
     jmp .loop
 .end:
+    rts
