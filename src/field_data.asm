@@ -9,5 +9,5 @@ stage2Table:
 
 filedLimitTable:
     ; field_limit_low+1, field_limit_low, field_limit_high+1, field_limit_high
-    .db $00,$08,$01,$F0 ; field 0
-    .db $00,$08,$08,$C0 ; field 1
+    .db $00,$00,$02,$00 ; field 0
+    .db $00,$00,$08,$E0 ; field 1

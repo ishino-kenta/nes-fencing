@@ -19,7 +19,7 @@ PlayerWin:
     sta player2_screen_x
     sta player1_crouch
     lda #RUN
-    sta player1_speed
+    sta player1_speed_index
     
     jmp .w
 
@@ -42,7 +42,7 @@ PlayerWin:
     sta player1_screen_x
     sta player2_crouch
     lda #RUN
-    sta player2_speed
+    sta player2_speed_index
 
     jmp .w
 .not2:
@@ -75,10 +75,40 @@ PlayerWin:
 
     ; set BG
 
+    lda #LOW(title)
+    sta source_addr
+    lda #HIGH(title)
+    sta source_addr+1
+    lda #LOW(title_attr)
+    sta source_addr+2
+    lda #HIGH(title_attr)
+    sta source_addr+3
     jsr ReloadBG
 
     ; WIN
     
+    ldx #$00
+    lda #$C0
+    sta DRAW_BUFFER, x ; lenght
+    inx
+    lda #FLAG_DATA_ONE
+    sta DRAW_BUFFER, x ; flag
+    inx
+    lda #$20
+    sta DRAW_BUFFER, x ; addr high
+    inx
+    lda #$F0
+    sta DRAW_BUFFER, x ; addr low
+    inx
+    lda #$00
+    sta DRAW_BUFFER, x ; data
+    inx
+    lda #$00
+    sta DRAW_BUFFER, x ; end
+    inx
+    
+    jsr DrawBG
+
     ldx #$00
     lda #$40
     sta DRAW_BUFFER, x ; lenght

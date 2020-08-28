@@ -47,14 +47,14 @@ DissappearPlayer:
 
     lda player1_dead
     beq .1
-    lda #$00
+    lda #$FF
     sta player1_x
     sta player1_x+1
 .1:
 
     lda player2_dead
     beq .2
-    lda #$00
+    lda #$FF
     sta player2_x
     sta player2_x+1
 .2:
@@ -91,17 +91,18 @@ DecDead:
     lda tmp+1
     cmp #$FF
     bne .11
-    lda #$FE
+    lda #$00
     sta tmp
     sta tmp+1
     lda #$03
     sta player1_dead
 .11:
     lda tmp
-    clc
-    adc #$08
+;    clc
+;    adc #$08 ; Forgot what to add
     sta player1_x
     lda tmp+1
+;    adc #$00
     sta player1_x+1
 
     lda #$A0
@@ -142,7 +143,7 @@ DecDead:
     bcc .bbb
     jmp .ccc
 .bbb:
-    lda #$FE
+    lda #$00
     sta tmp
     sta tmp+1
     lda #$03
@@ -150,11 +151,11 @@ DecDead:
 .ccc:
 
     lda tmp
-    sec
-    sbc #$08
+;    sec
+;    sbc #$08 ; Forgot what to sub
     sta player2_x
     lda tmp+1
-    sbc #$00
+;    sbc #$00
     sta player2_x+1
 ;
     lda #$A0

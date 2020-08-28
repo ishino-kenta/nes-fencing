@@ -1,10 +1,10 @@
 TIP_TABLE1 = $00
 TIP_TABLE2 = $08
 
-player1_tip_x   .rs 2
-player1_grip_x   .rs 2
-player2_tip_x   .rs 2
-player2_grip_x   .rs 2
+player1_hit_back   .rs 2
+player1_hit_front   .rs 2
+player2_hit_back   .rs 2
+player2_hit_front   .rs 2
 
 ComputeTip:
 
@@ -77,16 +77,16 @@ ComputeTip:
     beq .off1
     lda player1_fall_index
     bne .off1
-    lda player1_speed
+    lda player1_speed_index
     cmp #RUN
     bcs .off1
     jmp .on1
 .off1:
     lda #$FF
-    sta player1_tip_x
-    sta player1_tip_x+1
-    sta player1_grip_x
-    sta player1_grip_x+1
+    sta player1_hit_back
+    sta player1_hit_back+1
+    sta player1_hit_front
+    sta player1_hit_front+1
     jmp .end1
 .on1:
     lda player1_x
@@ -100,20 +100,24 @@ ComputeTip:
     lda tmp
     clc
     adc [source_addr], y
-    sta player1_tip_x
+    sta player1_hit_back
+    sta test+2
     iny
     lda tmp+1
     adc [source_addr], y
-    sta player1_tip_x+1
+    sta player1_hit_back+1
+    sta test+3
     iny
     lda tmp
     clc
     adc [source_addr], y
-    sta player1_grip_x
+    sta player1_hit_front
+    sta test+6
     iny
     lda tmp+1
     adc [source_addr], y
-    sta player1_grip_x+1
+    sta player1_hit_front+1
+    sta test+7
 .end1:
 
     ; compute player2 tip position
@@ -123,16 +127,16 @@ ComputeTip:
     beq .off2
     lda player2_fall_index
     bne .off2
-    lda player2_speed
+    lda player2_speed_index
     cmp #RUN
     bcs .off2
     jmp .on2
 .off2:
     lda #$FF
-    sta player2_tip_x
-    sta player2_tip_x+1
-    sta player2_grip_x
-    sta player2_grip_x+1
+    sta player2_hit_back
+    sta player2_hit_back+1
+    sta player2_hit_front
+    sta player2_hit_front+1
     jmp .end2
 .on2:
 
@@ -147,23 +151,23 @@ ComputeTip:
     lda tmp+2
     clc
     adc [source_addr], y
-    sta player2_tip_x
+    sta player2_hit_back
     iny
     lda tmp+3
     adc [source_addr], y
-    sta player2_tip_x+1
+    sta player2_hit_back+1
     iny
     lda tmp+2
     clc
     adc [source_addr], y
-    sta player2_grip_x
+    sta player2_hit_front
     iny
     lda tmp+3
     adc [source_addr], y
-    sta player2_grip_x+1
+    sta player2_hit_front+1
 .end2:
     rts
 
 tipTable:
-    .db $17,$00, $0B,$00, $F0,$FF, $FC,$FF 
-    .db $F0,$FF, $FC,$FF, $17,$00, $0B,$00
+    .db $17,$00, $0A,$00, $F0,$FF, $FD,$FF 
+    .db $F0,$FF, $FD,$FF, $17,$00, $0A,$00

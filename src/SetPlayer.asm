@@ -1,29 +1,43 @@
 ATTACK_TABLE1 = $00
 ATTACK_TABLE2 = $28
 SPRITE_TABLE1 = $00
-SPRITE_TABLE2 = $0C
+SPRITE_TABLE2 = $06 
 
 SetPlayer:
     ; set sprite data
     ; player1
     ldx oam_counter
 
+    lda player1_dead
+    beq .alive1
+
+    ldy #$00
+.dloop12:
+    lda #$FE
+    sta OAM, x
+    inx
+    iny
+    cpy #$14
+    bne .dloop12
+    jmp .end12
+
+.alive1:
     lda player1_y_top
     sec
     sbc #$01
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #$01
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$00
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player1_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
     
     ;
@@ -34,19 +48,19 @@ SetPlayer:
     lda player1_y
     sec
     sbc #$10
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #$02
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$00
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player1_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
     jmp .end1
 .crouch1:
@@ -70,19 +84,19 @@ SetPlayer:
     lda player1_y
     sec
     sbc #$08
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #03
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$00
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player1_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
 
 
@@ -93,7 +107,7 @@ SetPlayer:
     beq .off1
     lda player1_fall_index
     bne .off1
-    lda player1_speed
+    lda player1_speed_index
     cmp #RUN
     bcs .off1
     jmp .on1
@@ -150,20 +164,17 @@ SetPlayer:
     lda #$00
     sta tmp+1
 .loop1:
-    lda player1_sword_height
-    clc
-    adc [source_addr], y
-    clc
-    adc player1_y
-    sta OAM, x
+    lda player1_sword_y
+    sec
+    sbc #$04 ; The deviation from the center of the sprite + 1
+    sta OAM, x ; y
+    inx
+    lda [source_addr], y
+    sta OAM, x ; spr
     inx
     iny
     lda [source_addr], y
-    sta OAM, x
-    inx
-    iny
-    lda [source_addr], y
-    sta OAM, x
+    sta OAM, x ; attr
     inx
     iny
     lda player1_screen_x
@@ -173,7 +184,7 @@ SetPlayer:
     sec
     sbc tmp
 .6:
-    sta OAM, x
+    sta OAM, x ; x
     inx
     iny
 
@@ -185,23 +196,36 @@ SetPlayer:
 .end12:
 
     ; player2
-    ;
+
+    lda player2_dead
+    beq .alive2
+
+    ldy #$00
+.dloop22:
+    lda #$FE
+    sta OAM, x
+    inx
+    iny
+    cpy #$14
+    bne .dloop22
+    jmp .end22
+.alive2:
     lda player2_y_top
     sec
     sbc #$01
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #$01
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$01
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player2_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
     ;
 
@@ -211,19 +235,19 @@ SetPlayer:
     lda player2_y
     sec
     sbc #$10
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #$02
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$01
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player2_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
     jmp .end2
 .crouch2:
@@ -247,19 +271,19 @@ SetPlayer:
     lda player2_y
     sec
     sbc #$08
-    sta OAM, x
+    sta OAM, x ; y
     inx
 
     lda #$03
-    sta OAM, x
+    sta OAM, x ; spr
     inx
 
     lda #$01
-    sta OAM, x
+    sta OAM, x ; attr
     inx
 
     lda player2_screen_x
-    sta OAM, x
+    sta OAM, x ; x
     inx
 
     ; sword
@@ -269,7 +293,7 @@ SetPlayer:
     beq .off2
     lda player2_fall_index
     bne .off2
-    lda player2_speed
+    lda player2_speed_index
     cmp #RUN
     bcs .off2
     jmp .on2
@@ -326,20 +350,17 @@ SetPlayer:
     lda #$00
     sta tmp+1
 .loop2:
-    lda player2_sword_height
-    clc
-    adc [source_addr], y
-    clc
-    adc player2_y
-    sta OAM, x
+    lda player2_sword_y
+    sec
+    sbc #$04 ; The deviation from the center of the sprite + 1
+    sta OAM, x ; y
+    inx
+    lda [source_addr], y
+    sta OAM, x ; spr
     inx
     iny
     lda [source_addr], y
-    sta OAM, x
-    inx
-    iny
-    lda [source_addr], y
-    sta OAM, x
+    sta OAM, x ; attr
     inx
     iny
 
@@ -350,7 +371,7 @@ SetPlayer:
     sec
     sbc tmp
 .5:
-    sta OAM, x
+    sta OAM, x ; x
     inx
     iny
 
@@ -365,9 +386,9 @@ SetPlayer:
     rts
 
 spriteSwordTable1:
-;   .db offset_y, sprite_number, attribute, offset_x
-    .db $E6,$04,$00,$08, $E6,$05,$00,$10, $E6,$05,$00,$18 ; right
-    .db $E6,$04,$40,$F8, $E6,$05,$40,$F0, $E6,$05,$40,$E8 ; left
+;   .db sprite_number, attribute, offset_x
+    .db $04,$00,$08, $05,$00,$10 ; right
+    .db $04,$40,$F8, $05,$40,$F0 ; left
 spriteSwordTable2:
-    .db $E6,$04,$01,$08, $E6,$05,$01,$10, $E6,$05,$01,$18 ; right
-    .db $E6,$04,$41,$F8, $E6,$05,$41,$F0, $E6,$05,$41,$E8 ; left
+    .db $04,$01,$08, $05,$01,$10 ; right
+    .db $04,$41,$F8, $05,$41,$F0 ; left

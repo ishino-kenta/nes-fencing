@@ -55,7 +55,7 @@ DrawBG:
     ; mode
     lda DRAW_BUFFER, x
     inx
-    and #$06
+    and #$0E
 
     tay
     lda .pointer_table, y

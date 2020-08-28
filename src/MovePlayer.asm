@@ -1,6 +1,6 @@
 SPEED = $01
-player1_speed   .rs 1
-player2_speed   .rs 1
+player1_speed_index   .rs 1
+player2_speed_index   .rs 1
 
 player1_run .rs 1
 
@@ -10,16 +10,12 @@ SPEED_MAX = $0C
 MovePlayer1:
 
     ; test code ---
-;     lda #$03
-;     sta player1_speed
-;     sta player2_speed
-;     lda pad1
-;     and #PAD_SELECT
-;     beq .aaa
-;     lda #$01
-;     sta player1_speed
-;     sta player2_speed
-; .aaa:
+    lda pad1
+    and #PAD_SELECT
+    beq .aaa
+    lda #$01
+    sta player1_speed_index
+.aaa:
     ; test code ---
 
 
@@ -36,10 +32,10 @@ MovePlayer1:
     lda pad1
     and #PAD_RIGHT
     beq .end_right1
-    lda player1_speed
+    lda player1_speed_index
     clc
     adc #$01
-    sta player1_speed
+    sta player1_speed_index
     lda player1_crouch
     cmp #CROUCH
     beq .do11
@@ -48,15 +44,15 @@ MovePlayer1:
     jmp .not11
 .do11:
     lda #SPEED_MAX
-    sta player1_speed
+    sta player1_speed_index
 .not11:
-    lda player1_speed
+    lda player1_speed_index
     cmp #SPEED_MAX+1
     bne .s11
     lda #SPEED_MAX
-    sta player1_speed
+    sta player1_speed_index
 .s11:
-    ldx player1_speed
+    ldx player1_speed_index
     lda player1_x
     clc
     adc moveTable, x
@@ -64,8 +60,6 @@ MovePlayer1:
     lda player1_x+1
     adc #$00
     sta player1_x+1
-
-    ; jsr WallHit1Right
 
     lda #CHECK_RIGHT
     sta tmp+6
@@ -77,10 +71,10 @@ MovePlayer1:
     lda pad1
     and #PAD_LEFT
     beq .end_left1
-    lda player1_speed
+    lda player1_speed_index
     clc
     adc #$01
-    sta player1_speed
+    sta player1_speed_index
     lda player1_crouch
     cmp #CROUCH
     beq .do12
@@ -89,15 +83,15 @@ MovePlayer1:
     jmp .not12
 .do12:
     lda #SPEED_MAX
-    sta player1_speed
+    sta player1_speed_index
 .not12:
-    lda player1_speed
+    lda player1_speed_index
     cmp #SPEED_MAX+1
     bne .s12
     lda #SPEED_MAX
-    sta player1_speed
+    sta player1_speed_index
 .s12:
-    ldx player1_speed
+    ldx player1_speed_index
     lda player1_x
     sec
     sbc moveTable, x
@@ -106,14 +100,11 @@ MovePlayer1:
     sbc #$00
     sta player1_x+1
 
-    ;jsr WallHit1Left
-
     lda #CHECK_LEFT
     sta tmp+6
     lda #PLAYER1
     jsr CheckHit
 .end_left1:
-
 
     lda pad1
     and #PAD_RIGHT+PAD_LEFT
@@ -121,9 +112,8 @@ MovePlayer1:
     jmp .end1
 .stay1:
     lda #$00
-    sta player1_speed
+    sta player1_speed_index
 .end1:
-
 
     rts
 
@@ -143,10 +133,10 @@ MovePlayer2:
     lda pad2
     and #PAD_RIGHT
     beq .end_right2
-    lda player2_speed
+    lda player2_speed_index
     clc
     adc #$01
-    sta player2_speed
+    sta player2_speed_index
     lda player2_crouch
     cmp #CROUCH
     beq .do21
@@ -155,15 +145,15 @@ MovePlayer2:
     jmp .not21
 .do21:
     lda #SPEED_MAX
-    sta player2_speed
+    sta player2_speed_index
 .not21:
-    lda player2_speed
+    lda player2_speed_index
     cmp #SPEED_MAX+1
     bne .s21
     lda #SPEED_MAX
-    sta player2_speed
+    sta player2_speed_index
 .s21:
-    ldx player2_speed
+    ldx player2_speed_index
     lda player2_x
     clc
     adc moveTable, x
@@ -171,7 +161,7 @@ MovePlayer2:
     lda player2_x+1
     adc #$00
     sta player2_x+1
-    ;jsr WallHit2Right
+
     lda #CHECK_RIGHT
     sta tmp+6
     lda #PLAYER2
@@ -181,10 +171,10 @@ MovePlayer2:
     lda pad2
     and #PAD_LEFT
     beq .end_left2
-    lda player2_speed
+    lda player2_speed_index
     clc
     adc #$01
-    sta player2_speed
+    sta player2_speed_index
     lda player2_crouch
     cmp #CROUCH
     beq .do22
@@ -193,15 +183,15 @@ MovePlayer2:
     jmp .not22
 .do22:
     lda #SPEED_MAX
-    sta player2_speed
+    sta player2_speed_index
 .not22:
-    lda player2_speed
+    lda player2_speed_index
     cmp #SPEED_MAX+1
     bne .s22
     lda #SPEED_MAX
-    sta player2_speed
+    sta player2_speed_index
 .s22:
-    ldx player2_speed
+    ldx player2_speed_index
     lda player2_x
     sec
     sbc moveTable, x
@@ -209,7 +199,7 @@ MovePlayer2:
     lda player2_x+1
     sbc #$00
     sta player2_x+1
-    ;jsr WallHit2Left
+
     lda #CHECK_LEFT
     sta tmp+6
     lda #PLAYER2
@@ -222,7 +212,7 @@ MovePlayer2:
     jmp .end2
 .stay2:
     lda #$00
-    sta player2_speed
+    sta player2_speed_index
 .end2:
     rts
 

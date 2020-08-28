@@ -222,6 +222,10 @@ MoveScreen:
     sta nt_base
 
     ; compule screen scrolling direction
+
+    lda direction_scroll
+    sta direction_scroll_pre
+
     lda scroll_x+1
     cmp scroll_x_pre+1
     beq .1
@@ -239,5 +243,14 @@ MoveScreen:
     lda #DIRECTION_RIGHT
 .end:
     sta direction_scroll
+
+    lda direction_scroll
+    cmp direction_scroll_pre
+    beq .s
+    lda scroll_x_pre
+    sta scroll_x
+    lda scroll_x_pre+1
+    sta scroll_x+1
+.s:
 
     rts

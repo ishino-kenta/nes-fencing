@@ -13,7 +13,7 @@ ComputePlayerTop:
     bne .stand1
     lda tmp
     clc
-    adc #$0D
+    adc #$0B
     sta tmp
 .stand1:
     lda tmp
@@ -29,7 +29,7 @@ ComputePlayerTop:
     bne .stand2
     lda tmp
     clc
-    adc #$0D
+    adc #$0B
     sta tmp
 .stand2:
     lda tmp

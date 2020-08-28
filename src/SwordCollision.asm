@@ -17,24 +17,24 @@ SwordCollision:
     jmp .p2_p1
     
 .p1_p2:
-    lda player1_tip_x+1
-    cmp player2_tip_x+1
+    lda player1_hit_back+1
+    cmp player2_hit_back+1
     beq .6
     bcc .end1
     jmp .7
 .6:
-    lda player1_tip_x
-    cmp player2_tip_x
+    lda player1_hit_back
+    cmp player2_hit_back
     bcc .end1
 .7:
-    lda player2_grip_x+1
-    cmp player1_grip_x+1
+    lda player2_hit_front+1
+    cmp player1_hit_front+1
     beq .10
     bcc .end1
     jmp .11
 .10:
-    lda player2_grip_x
-    cmp player1_grip_x
+    lda player2_hit_front
+    cmp player1_hit_front
     bcc .end1
 .11:
 
@@ -57,24 +57,24 @@ SwordCollision:
     jmp .end
 
 .p2_p1:
-    lda player2_tip_x+1
-    cmp player1_tip_x+1
+    lda player2_hit_back+1
+    cmp player1_hit_back+1
     beq .8
     bcc .end
     jmp .9
 .8:
-    lda player2_tip_x
-    cmp player1_tip_x
+    lda player2_hit_back
+    cmp player1_hit_back
     bcc .end
 .9:
-    lda player1_grip_x+1
-    cmp player2_grip_x+1
+    lda player1_hit_front+1
+    cmp player2_hit_front+1
     beq .13
     bcc .end
     jmp .14
 .13:
-    lda player1_grip_x
-    cmp player2_grip_x
+    lda player1_hit_front
+    cmp player2_hit_front
     bcc .end
 .14:
 

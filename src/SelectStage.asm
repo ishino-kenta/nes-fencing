@@ -60,6 +60,14 @@ SelectStage:
     sta soft2001
     sta $2001
 
+    lda #LOW(tile1)
+    sta source_addr
+    lda #HIGH(tile1)
+    sta source_addr+1
+    lda attr_addr
+    sta source_addr+2
+    lda attr_addr+1
+    sta source_addr+3
     jsr ReloadBG
 
     lda soft2000

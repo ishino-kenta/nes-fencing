@@ -1,7 +1,8 @@
 InitSceneTitle:
 
-    lda #$00
+    lda #$08
     sta scroll_x
+    lda #$00
     sta scroll_x+1
 
     lda #LOW(SceneTitle)

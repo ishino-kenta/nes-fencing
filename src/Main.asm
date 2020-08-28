@@ -33,6 +33,7 @@ oam_counter .rs 1
 scroll_x    .rs 2
 scroll_x_pre    .rs 2
 direction_scroll    .rs 1
+direction_scroll_pre    .rs 1
 nt_base .rs 1
 scroll_y    .rs 2
 
@@ -56,13 +57,18 @@ game_scene  .rs 2
 
 
      .bank 0
-     .org $8000
+     .org $A000
 tile3:
     .incbin "src/res/field4_24.tile"
+tile3_attr:
+    .incbin "src/res/field4_24.attr"
+
      .bank 1
      .org $A000
 tile1:
     .incbin "src/res/field3_24.tile"
+tile1_attr:
+    .incbin "src/res/field3_24.attr"
 
     .bank 2
     .org $8000
@@ -71,8 +77,12 @@ tile1:
     .org $A000
 title:
     .incbin "src/res/title.tile"
+title_attr:
+    .incbin "src/res/title.attr"
 stage:
     .incbin "src/res/stage.tile"
+stage_attr:
+    .incbin "src/res/stage.attr"
 win:
     .incbin "src/res/win.tile"
 
@@ -104,7 +114,19 @@ Main:
 
     jsr InitSceneTitle
 
+    lda #LOW(title)
+    sta source_addr
+    lda #HIGH(title)
+    sta source_addr+1
+    lda #LOW(title_attr)
+    sta source_addr+2
+    lda #HIGH(title_attr)
+    sta source_addr+3
     jsr ReloadBG
+
+.vw3:
+    bit $2002
+    bpl .vw3
 
     ; horizontal mirroring
     lda #$01
@@ -195,7 +217,7 @@ SceneBattle:
     beq .off
     lda player1_fall_index
     bne .off
-    lda player1_speed
+    lda player1_speed_index
     cmp #RUN
     bcs .off
     lda player2_crouch
@@ -203,7 +225,7 @@ SceneBattle:
     beq .off
     lda player2_fall_index
     bne .off
-    lda player2_speed
+    lda player2_speed_index
     cmp #RUN
     bcs .off
     jsr SwordCollision
@@ -211,7 +233,7 @@ SceneBattle:
     jsr PlayerBoundaryCheck2
 .off:
     
-    jsr SwordHitCheck
+    jsr CheckHitAttack
 .3:
 
     jsr DissappearPlayer
@@ -262,6 +284,14 @@ SceneTitle:
     sta soft2001
     sta $2001
 
+    lda #LOW(stage)
+    sta source_addr
+    lda #HIGH(stage)
+    sta source_addr+1
+    lda #LOW(stage_attr)
+    sta source_addr+2
+    lda #HIGH(stage_attr)
+    sta source_addr+3
     jsr ReloadBG
 
     lda soft2000
@@ -326,6 +356,14 @@ SceneResult:
     sta soft2001
     sta $2001
 
+    lda #LOW(stage)
+    sta source_addr
+    lda #HIGH(stage)
+    sta source_addr+1
+    lda #LOW(stage_attr)
+    sta source_addr+2
+    lda #HIGH(stage_attr)
+    sta source_addr+3
     jsr ReloadBG
 
     ldx #$00
@@ -445,7 +483,7 @@ palette:
     .include "./src/SetPlayer.asm"
     .include "./src/SwordCollision.asm"
     .include "./src/ComputeTip.asm"
-    .include "./src/SwordHitCheck.asm"
+    .include "./src/CheckHitAttack.asm"
     .include "./src/PlayerBoundaryCheck.asm"
     .include "./src/CheckHit.asm"
 

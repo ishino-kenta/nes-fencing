@@ -30,5 +30,5 @@ SetCursor:
 
 cursorTable:
     ; cursor_y, corsor_x
-    .db $3F,$20
-    .db $4F,$20
+    .db $3F,$18
+    .db $4F,$18

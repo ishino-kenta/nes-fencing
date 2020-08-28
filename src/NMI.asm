@@ -17,6 +17,8 @@ NMI:
 
     bit $20
     lda scroll_x
+    sec
+    sbc #$08
     sta $2005
     lda scroll_y
     sta $2005

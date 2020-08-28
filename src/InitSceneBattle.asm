@@ -1,4 +1,4 @@
-field_num   .rs 1 ; 1~
+field_num   .rs 1 ; 7~
 
 stage_table_addr    .rs 2
 
@@ -16,12 +16,12 @@ InitSceneBattle:
     lda #VACANT
     sta player_lead
 
-    lda #$20
+    lda #$50
     sta player1_x
     lda #$04
     sta player1_x+1
 
-    lda #$A0
+    lda #$88
     sta player2_x
     lda #$04
     sta player2_x+1
@@ -46,6 +46,13 @@ InitSceneBattle:
     lda tmp+1
     sbc #$00
     sta scroll_x+1
+    cmp #$FF ; boundary check
+    bne .ok
+    lda field_limit_low+1
+    sta scroll_x+1
+    lda field_limit_low
+    sta scroll_x
+.ok:
 
     lda #$80
     sta player1_y
@@ -80,9 +87,35 @@ InitSceneBattle:
     lda filedLimitTable, x
     inx
     sta field_limit_high+1
+    sta attr_addr+1
     lda filedLimitTable, x
     inx
     sta field_limit_high
+    sta attr_addr
+
+    ; attr data address
+    ; tile + (limit_high / 8 * 24)
+    lda attr_addr
+    and #$F8
+    sta tmp
+    lda attr_addr+1
+    sta tmp+1
+    asl attr_addr
+    rol attr_addr+1
+    lda attr_addr
+    clc
+    adc tmp
+    sta attr_addr
+    lda attr_addr+1
+    adc tmp+1
+    sta attr_addr+1
+    lda #LOW(tile1)
+    clc
+    adc attr_addr
+    sta attr_addr
+    lda #HIGH(tile1)
+    adc attr_addr+1
+    sta attr_addr+1
 
     lda #$07
     sta $8000
