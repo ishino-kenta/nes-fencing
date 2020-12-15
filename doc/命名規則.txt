@@ -1,5 +1,6 @@
 変数 xxx_yyy_zzz
 ラベル XxxYyyZzz
-一時ラベル .xxx_yyy_zzz
+一時ラベル .XxxYyyZzz
 定数 XXX_YYY_ZZZ
 データのラベル xxxYyyZzz
+一時データのラベル .xxxYyyZyy

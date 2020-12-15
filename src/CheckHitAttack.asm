@@ -20,11 +20,9 @@ CheckHitAttack:
     clc
     adc #HURT_LEFT
     sta tmp
-    sta test
     lda player2_x+1
     adc #$00
     sta tmp+1
-    sta test+1
 
     lda tmp+1
     cmp player1_hit_back+1
@@ -42,11 +40,9 @@ CheckHitAttack:
     clc
     adc #HURT_RIGHT
     sta tmp
-    sta test+4
     lda player2_x+1
     adc #$00
     sta tmp+1
-    sta test+5
 
     lda player1_hit_front+1
     cmp tmp+1

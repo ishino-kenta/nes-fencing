@@ -17,13 +17,15 @@ InitSceneBattle:
     sta player_lead
 
     lda #$50
+    lda #$00
     sta player1_x
-    lda #$04
+    lda #$01
     sta player1_x+1
 
     lda #$88
+    lda #$00
     sta player2_x
-    lda #$04
+    lda #$01
     sta player2_x+1
 
     lda player1_x
@@ -94,21 +96,8 @@ InitSceneBattle:
     sta attr_addr
 
     ; attr data address
-    ; tile + (limit_high / 8 * 24)
-    lda attr_addr
-    and #$F8
-    sta tmp
-    lda attr_addr+1
-    sta tmp+1
-    asl attr_addr
-    rol attr_addr+1
-    lda attr_addr
-    clc
-    adc tmp
-    sta attr_addr
-    lda attr_addr+1
-    adc tmp+1
-    sta attr_addr+1
+    inline mul/mul28_3
+
     lda #LOW(tile1)
     clc
     adc attr_addr
@@ -122,6 +111,8 @@ InitSceneBattle:
     ldy field_num
     lda [stage_table_addr], y
     sta $8001
+
+    jsr Sandbox
 
     rts
 

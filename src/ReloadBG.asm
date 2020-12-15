@@ -1,19 +1,26 @@
+;--------------------------------------------------
+; in
+; source_addr+0,1: Tile address
+; source_addr+2,3: Attribute address
+
 ReloadBG:
+    ; tile
     lda #$00
     sta tmp
+    sta tmp+7 ; Changing bank flag
 .loop:
     ldx #$00
 
-    lda #$18
-    sta DRAW_BUFFER, x ; lenght
+    lda #NUMBER_OF_TILE
+    sta DRAW_BUFFER, x ; Lenght
     inx
 
     lda #FLAG_INC32+FLAG_DATA_ROM
-    sta DRAW_BUFFER, x ; flag
+    sta DRAW_BUFFER, x ; Flag
     inx
 
     lda #$20
-    sta DRAW_BUFFER, x ; addr high
+    sta DRAW_BUFFER, x ; Addr high
     inx
 
     lda scroll_x
@@ -27,69 +34,31 @@ ReloadBG:
     clc
     adc #$01 ; left clip correction
     and #$1F
+    clc
+    adc #$20 ; top line not drawn
     sta DRAW_BUFFER, x ; addr low
     inx
 
-    ; scroll_x / 8 * 24
-    lda scroll_x
-    sta tmp+1
-    lda scroll_x+1
-    sta tmp+2
-
-    lda tmp+1
-    and #$F8
-    sta tmp+1
-    sta tmp+3
-    lda tmp+2
-    sta tmp+4
-
-    asl tmp+1
-    rol tmp+2
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
-    ; tmp * 24
-    lda tmp
-    sta tmp+3
-    lda #$00
-    sta tmp+4
-    asl tmp+3
-    rol tmp+4
-    asl tmp+3
-    rol tmp+4
-    asl tmp+3
-    rol tmp+4
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
-    asl tmp+3
-    rol tmp+4
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
-
+    inline mul/mul28_2
 
     lda tmp+1
     clc
-    adc source_addr
+    adc #$00
     sta DRAW_BUFFER, x ; data high
     inx
 
     lda tmp+2
-    adc source_addr+1
+    adc #$80
     sta DRAW_BUFFER, x ; data low
+    lda tmp+7
+    asl a
+    asl a
+    asl a
+    asl a
+    asl a
+    clc
+    adc DRAW_BUFFER, x
+    sta DRAW_BUFFER, x
     inx
 
     lda #$00
@@ -104,39 +73,8 @@ ReloadBG:
     jmp .loop
 .end:
 
-    ; scroll_x / 32 * 6
-    lda scroll_x
-    sta tmp+1
-    lda scroll_x+1
-    sta tmp+2
-
-    lsr tmp+2
-    ror tmp+1
-    lsr tmp+2
-    ror tmp+1
-    lsr tmp+2
-    ror tmp+1
-    lsr tmp+2
-    ror tmp+1
-    lsr tmp+2
-    ror tmp+1
-
-    asl tmp+1
-    rol tmp+2
-    lda tmp+1
-    sta tmp+3
-    lda tmp+2
-    sta tmp+4
-
-    asl tmp+1
-    rol tmp+2
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
+    ; attribute
+    inline mul/mul8_2
 
     lda tmp+1
     clc
@@ -152,7 +90,7 @@ ReloadBG:
 
     ldx #$00
 
-    lda #$06
+    lda #NUMBER_OF_ATTR
     sta DRAW_BUFFER, x ; lenght
     inx
 
@@ -165,8 +103,6 @@ ReloadBG:
     inx
 
     lda scroll_x
-    ; sec
-    ; sbc #$08 ; not use.
     lsr a
     lsr a
     lsr a
@@ -180,35 +116,7 @@ ReloadBG:
     sta DRAW_BUFFER, x ; addr low
     inx
 
-    ; tmp * 6
-    lda tmp+5
-    sta tmp+1
-    lda tmp+6
-    sta tmp+2
-    
-    lda tmp
-    sta tmp+3
-    lda #$00
-    sta tmp+4
-    asl tmp+3
-    rol tmp+4
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
-
-    asl tmp+3
-    rol tmp+4
-    lda tmp+1
-    clc
-    adc tmp+3
-    sta tmp+1
-    lda tmp+2
-    adc tmp+4
-    sta tmp+2
+    inline mul/mul8_3
 
     lda #$00
     sta tmp+4
@@ -236,7 +144,7 @@ ReloadBG:
 .not:
 
     lda tmp+3
-    sta DRAW_BUFFER, x
+    sta DRAW_BUFFER, x ; data
     inx
 
     lda tmp+1
@@ -249,7 +157,7 @@ ReloadBG:
     
     inc tmp+4
     lda tmp+4
-    cmp #$06
+    cmp #$08
     beq .endl
     jmp .looop
 .endl:

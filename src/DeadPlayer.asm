@@ -13,6 +13,9 @@ DeadPlayer1:
     lda #DEAD_TIME
     sta player1_dead
 
+    lda #SWORD_MID
+    sta player1_sword_height
+
     ; check lead player
     lda player2_dead
     beq .1
@@ -30,6 +33,9 @@ DeadPlayer2:
 
     lda #DEAD_TIME
     sta player2_dead
+
+    lda #SWORD_MID
+    sta player2_sword_height
 
     ; check lead player
     lda player1_dead

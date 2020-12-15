@@ -10,4 +10,8 @@ stage2Table:
 filedLimitTable:
     ; field_limit_low+1, field_limit_low, field_limit_high+1, field_limit_high
     .db $00,$00,$02,$00 ; field 0
-    .db $00,$00,$08,$E0 ; field 1
+    .db $00,$00,$03,$00 ; field 1
+
+
+testData:
+    .db $08,$09,$0A,$00

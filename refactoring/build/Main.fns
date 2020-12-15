@@ -1,0 +1,27 @@
+; .\Main.asm
+areaCommand                      = $C54D
+IRQ                              = $E03C
+stage                            = $C320
+palette                          = $C150
+objectData                       = $C3D2
+SetStage                         = $C2ED
+SceneTitle                       = $C05F
+baseTile                         = $C38C
+InitBank                         = $E082
+FillTileBuffRow                  = $C416
+stage1                           = $C324
+ReadPad1                         = $C18A
+Main                             = $C000
+ReadPad2                         = $C1A7
+LoadPalette                      = $C170
+DrawBG                           = $C1C4
+initBankTable                    = $E095
+RESET                            = $E03D
+InitSprites                      = $E07D
+NMI                              = $E000
+FillDrawBuffRow                  = $C54F
+MainLoop                         = $C034
+WatiNMI                          = $C03C
+Command1                         = $C52F
+ClearMemory                      = $E05E
+SetArea                          = $C664

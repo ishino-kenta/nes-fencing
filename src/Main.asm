@@ -8,15 +8,16 @@ inline .macro
     .include "./src/\1_inline.asm"
     .endm
 
+; Constant
 OAM = $0200
 DIRECTION_LEFT = $01
 DIRECTION_RIGHT = $00
 
 
-
+; Variable
     .rsset $0000
 test .rs 10
-tmp .rs 7
+tmp .rs 9
 source_addr .rs 4
 
 draw_ready  .rs 1
@@ -55,20 +56,20 @@ player2_sword_off   .rs 1
 
 game_scene  .rs 2
 
-
+; Char datas in each bank
      .bank 0
      .org $A000
 tile3:
-    .incbin "src/res/field4_24.tile"
+    .incbin "src/res/field6_28.tile"
 tile3_attr:
-    .incbin "src/res/field4_24.attr"
+    .incbin "src/res/field6_32.attr"
 
      .bank 1
      .org $A000
 tile1:
-    .incbin "src/res/field3_24.tile"
+    .incbin "src/res/field5_28.tile"
 tile1_attr:
-    .incbin "src/res/field3_24.attr"
+    .incbin "src/res/field5_32.attr"
 
     .bank 2
     .org $8000
@@ -76,13 +77,13 @@ tile1_attr:
     .bank 3
     .org $A000
 title:
-    .incbin "src/res/title.tile"
+    .incbin "src/res/title_28.tile"
 title_attr:
-    .incbin "src/res/title.attr"
+    .incbin "src/res/title_32.attr"
 stage:
-    .incbin "src/res/stage.tile"
+    .incbin "src/res/stage_28.tile"
 stage_attr:
-    .incbin "src/res/stage.attr"
+    .incbin "src/res/stage_32.attr"
 win:
     .incbin "src/res/win.tile"
 
@@ -95,6 +96,7 @@ win:
     .bank 6
     .org $C000
 
+; Main flow
 Main:
 
 .vw1:
@@ -166,42 +168,41 @@ SceneBattle:
 
     lda player1_dead
     bne .1
-    jsr MovePlayer1
+    ;jsr MovePlayer1
     jsr PlayerBoundaryCheck1
     jsr ChangeSwordHeight1
     jsr Attack1
     jsr Jump1
     jsr Fall1
     jsr ComputePlayerTop
-    jsr Sandbox
-    lda #CHECK_BOTTOM
-    sta tmp+6
-    lda #PLAYER1
-    jsr CheckHit
-    lda #CHECK_TOP
-    sta tmp+6
-    lda #PLAYER1
-    jsr CheckHit
+    ; lda #CHECK_BOTTOM
+    ; sta tmp+6
+    ; lda #PLAYER1
+    ; jsr CheckHit
+    ; lda #CHECK_TOP
+    ; sta tmp+6
+    ; lda #PLAYER1
+    ; jsr CheckHit
     jsr Crouch1
 .1:
 
     lda player2_dead
     bne .2
-    jsr MovePlayer2
+    ;jsr MovePlayer2
     jsr PlayerBoundaryCheck2
     jsr ChangeSwordHeight2
     jsr Attack2
     jsr Jump2
     jsr Fall2
     jsr ComputePlayerTop
-    lda #CHECK_BOTTOM
-    sta tmp+6
-    lda #PLAYER2
-    jsr CheckHit
-    lda #CHECK_TOP
-    sta tmp+6
-    lda #PLAYER2
-    jsr CheckHit
+    ; lda #CHECK_BOTTOM
+    ; sta tmp+6
+    ; lda #PLAYER2
+    ; jsr CheckHit
+    ; lda #CHECK_TOP
+    ; sta tmp+6
+    ; lda #PLAYER2
+    ; jsr CheckHit
     jsr Crouch2
 .2:
 
@@ -238,7 +239,8 @@ SceneBattle:
 
     jsr DissappearPlayer
 
-    jsr MoveScreen
+    ;jsr MoveScreen
+    jsr Sandbox3
     jsr SetPlayerPosition
     jsr SetPlayer
 
@@ -392,11 +394,11 @@ SceneResult:
     jmp MainLoop
 
 
-
+    ; NMI and IRQ
     .include "./src/NMI.asm"    
     .include "./src/IRQ.asm"
 
-
+    ; Subroutines
     .include "./src/DeadPlayer.asm"
     .include "./src/MovePlayer.asm"
     .include "./src/ChangeSwordHeight.asm"
@@ -416,8 +418,6 @@ SceneResult:
     .include "./src/SetCursor.asm"
     .include "./src/SetPlayerPosition.asm"
     .include "./src/PlayerWin.asm"
-;    .include "./src/WallHit.asm"
-
 
     .bank 7
     .org $E000

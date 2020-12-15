@@ -101,23 +101,19 @@ ComputeTip:
     clc
     adc [source_addr], y
     sta player1_hit_back
-    sta test+2
     iny
     lda tmp+1
     adc [source_addr], y
     sta player1_hit_back+1
-    sta test+3
     iny
     lda tmp
     clc
     adc [source_addr], y
     sta player1_hit_front
-    sta test+6
     iny
     lda tmp+1
     adc [source_addr], y
     sta player1_hit_front+1
-    sta test+7
 .end1:
 
     ; compute player2 tip position

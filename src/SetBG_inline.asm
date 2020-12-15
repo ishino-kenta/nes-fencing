@@ -1,7 +1,9 @@
+NUMBER_OF_TILE = $1C
+
 SetBG:
     ldx ppu_counter
 
-    lda #$18
+    lda #NUMBER_OF_TILE
     sta DRAW_BUFFER, x ; lenght
     inx
     
@@ -19,67 +21,100 @@ SetBG:
     lsr a
     lsr a
     lsr a
+    clc
+    adc #$20 ; top line not drawn
     sta DRAW_BUFFER, x ; addr low
     inx
     
-    lda scroll_x
-    sta tmp
-    lda scroll_x+1
-    sta tmp+1
 
     lda direction_scroll
     cmp #DIRECTION_RIGHT
     bne .3
-    lda tmp
+    lda scroll_x
     clc
     adc #$F8
-    sta tmp
-    lda tmp+1
+    sta tmp ; col
+    lda #$00
     adc #$00
-    sta tmp+1
+    sta tmp+4 ; bank
+    lda scroll_x
+    clc
+    adc #$F8
+    lda scroll_x+1
+    adc #$00
+    sta tmp+1 ; num
 .3:
     lda direction_scroll
     cmp #DIRECTION_LEFT
     bne .4
-    lda tmp
+    lda scroll_x
     sec
     sbc #$07
     sta tmp
-    lda tmp+1
+    lda #$00
+    sbc #$00
+    sta tmp+4
+    lda scroll_x
+    sec
+    sbc #$07
+    lda scroll_x+1
     sbc #$00
     sta tmp+1
 .4:
 
-    lda tmp
-    and #$F8
-    sta tmp
-    sta tmp+2
-    lda tmp+1
-    sta tmp+3
+    lda tmp+4
+    and #$01
+    asl a
+    asl a
+    asl a
+    asl a
+    asl a
+    sta tmp+4 ; bank(+2000)
 
-    asl tmp+2
-    rol tmp+3
+    ldy tmp+1
+    lda testData, y
+    and #$07
+    asl a
+    asl a
+    asl a
+    asl a
+    asl a
+    sta tmp+1 ; num*32
+
+    lda tmp
+    lsr a
+    lsr a
+    lsr a
+    sta tmp ; col
 
     lda tmp
     clc
-    adc tmp+2
+    adc tmp+1
     sta tmp
+    lda #$00
+    adc #$00
+    sta tmp+1
+
+    inline mul/mul28_1
+
     lda tmp+1
-    adc tmp+3
+    clc
+    adc #$80
+    clc
+    adc tmp+4
     sta tmp+1
 
     lda tmp
-    clc
-    adc #LOW(tile1)
-    sta DRAW_BUFFER, x ; data high
+    sta DRAW_BUFFER, x ; data low
+    sta test+3
     inx
     lda tmp+1
-    adc #HIGH(tile1)
-    sta DRAW_BUFFER, x ; data low
+    sta DRAW_BUFFER, x ; data high
+    sta test+2
     inx
 
     ; attribute
-    lda #$06
+    lda #NUMBER_OF_ATTR
     sta DRAW_BUFFER, x ; lenght
     inx
     
@@ -126,79 +161,7 @@ SetBG:
     sbc #$00
     sta tmp+3 ; left
     
-    ; scroll_x / 32 * 6
-    ; right
-    lsr tmp+1
-    ror tmp
-    lsr tmp+1
-    ror tmp
-    lsr tmp+1
-    ror tmp
-    lsr tmp+1
-    ror tmp
-    lsr tmp+1
-    ror tmp
-
-    asl tmp
-    rol tmp+1
-    lda tmp
-    sta tmp+4
-    lda tmp+1
-    sta tmp+5
-
-    asl tmp
-    rol tmp+1
-    lda tmp
-    clc
-    adc tmp+4
-    sta tmp
-    lda tmp+1
-    adc tmp+5
-    sta tmp+1
-
-    lda tmp
-    clc
-    adc attr_addr
-    sta tmp
-    lda tmp+1
-    adc attr_addr+1
-    sta tmp+1
-    ; left
-    lsr tmp+3
-    ror tmp+2
-    lsr tmp+3
-    ror tmp+2
-    lsr tmp+3
-    ror tmp+2
-    lsr tmp+3
-    ror tmp+2
-    lsr tmp+3
-    ror tmp+2
-
-    asl tmp+2
-    rol tmp+3
-    lda tmp+2
-    sta tmp+4
-    lda tmp+3
-    sta tmp+5
-
-    asl tmp+2
-    rol tmp+3
-    lda tmp+2
-    clc
-    adc tmp+4
-    sta tmp+2
-    lda tmp+3
-    adc tmp+5
-    sta tmp+3
-
-    lda tmp+2
-    clc
-    adc attr_addr
-    sta tmp+2
-    lda tmp+3
-    adc attr_addr+1
-    sta tmp+3
+    inline mul/mul8_1
 
     lda #$00
     sta tmp+4
@@ -275,7 +238,7 @@ SetBG:
 
     inc tmp+4
     lda tmp+4
-    cmp #$06
+    cmp #NUMBER_OF_ATTR
     beq .elp
     jmp .lp
 .elp:

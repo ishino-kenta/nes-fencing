@@ -1,0 +1,20 @@
+; .\Sandbox.asm
+IRQ                              = $E03C
+stage                            = $C088
+palette                          = $C0C8
+baseTile                         = $C0B0
+InitBank                         = $E082
+stage1                           = $C08C
+ReadPad1                         = $C102
+Main                             = $C000
+ReadPad2                         = $C11F
+LoadPalette                      = $C0E8
+Sandbox                          = $C04A
+DrawBG                           = $C13C
+initBankTable                    = $E095
+RESET                            = $E03D
+InitSprites                      = $E07D
+NMI                              = $E000
+MainLoop                         = $C02C
+WatiNMI                          = $C034
+ClearMemory                      = $E05E

@@ -1,0 +1,10 @@
+$0300-$03FF(FF)
+    DRAW_BUFF    
+    グラフィックのバッファ
+$0500-$06BF(1C0)
+    TILE_BUFFER
+    タイルのバッファ
+$06C0-$06F7(38)
+    DRAW_RAW_BUFF
+    TILE_BUFFERを変換してDRAW_BUFFに入れるためのバッファ
+    2*2のブロックを１列入れておく

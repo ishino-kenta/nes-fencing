@@ -38,10 +38,12 @@ CheckHit:
 
     ldy #$00
     lda [source_addr], y
+    sec
+    sbc #$08 ; top one line
     lsr a
     lsr a
     lsr a
-    sta tmp+5
+    sta tmp+5 ; player_y
 
     ; set x
     ldx tmp+4
@@ -62,18 +64,18 @@ CheckHit:
     lda [source_addr], y
     clc
     adc #$07
-    sta tmp
+    sta tmp ; player_x
     iny
     lda [source_addr], y
     adc #$00
-    sta tmp+1
+    sta tmp+1 ; player_x+1
     jmp .aaa4
 .aaa3:
     lda [source_addr], y
-    sta tmp
+    sta tmp ; player_x
     iny
     lda [source_addr], y
-    sta tmp+1
+    sta tmp+1 ; player_x+1
 .aaa4:
 
     lda #LOW(.l1)
@@ -101,6 +103,8 @@ CheckHit:
 
     ldy #$00
     lda [source_addr], y
+    sec
+    sbc #$08 ; top one line
     lsr a
     lsr a
     lsr a
@@ -149,24 +153,7 @@ CheckHit:
 
 
 .sub:
-
-    lda tmp
-    and #$F8
-    sta tmp
-    sta tmp+2
-    lda tmp+1
-    sta tmp+3
-
-    asl tmp
-    rol tmp+1
-
-    lda tmp+2
-    clc
-    adc tmp
-    sta tmp
-    lda tmp+3
-    adc tmp+1
-    sta tmp+1
+    inline mul/mul28_4
     
     lda #LOW(tile1)
     clc
