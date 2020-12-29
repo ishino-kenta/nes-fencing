@@ -11,7 +11,7 @@ DRAW_BUFF = $0300
     ; 変数
     .rsset $0000
 
-    .include "./Valiable.asm"
+    .include "./valiable.asm"
 
     .bank 0
     .org $C000
@@ -32,6 +32,8 @@ Main:
     bit $2002
     bpl .Vw3
 
+    jsr SetTitle
+
     lda #$00
     sta $A000 ; 垂直ミラーリング
 
@@ -46,6 +48,14 @@ Main:
     sta camera_x
     sta camera_x+1
 
+    lda #$01
+    sta stage
+
+    lda #LOW(SceneTitle)
+    sta scene
+    lda #HIGH(SceneTitle)
+    sta scene+1
+
 MainLoop:
 
     lda #$01
@@ -59,33 +69,38 @@ WatiNMI:
     bne .Loop
 
     lda #$00
-    sta ppu_counter
+    sta draw_buff_counter
     sta oam_counter
+    ldx #$00
+    sta DRAW_BUFF, x
 
     jsr ReadPad1
     jsr ReadPad2
 
-    lda #LOW(SceneTitle)
-    sta scene
-    lda #HIGH(SceneTitle)
-    sta scene+1
-
     jmp [scene]
 
     ; シーン
+    .include "./SceneBattle.asm"
     .include "./SceneTitle.asm"
-
-palette:
-    .incbin "./res/palette.pal"
+    .include "./SceneStageSelect.asm"
 
     ; サブルーチン
     .include "./subroutine/LoadPalette.asm"
     .include "./subroutine/ReadPad.asm"
     .include "./subroutine/DrawBG.asm"
     .include "./SetStage.asm"
-    .include "./FillTileBuffRow.asm"
-    .include "./FillDrawBuffRow.asm"
+    .include "./FillTileBuff.asm"
+    .include "./DrawTileBuff.asm"
     .include "./SetArea.asm"
+    .include "./SetTitle.asm"
+    .include "./DrawPlayer.asm"
+    .include "./SetCamera.asm"
+    .include "./Fall.asm"
+    .include "./Move.asm"
+    .include "./DrawCameraEdge.asm"
+    .include "./CollisionDetection.asm"
+    .include "./SetPlayerDirection.asm"
+
 
     .bank 1
     .org $E000
@@ -94,6 +109,9 @@ palette:
     .include "./NMI.asm"
     .include "./IRQ.asm"
     .include "./RESET.asm"
+
+palette:
+    .incbin "./res/palette.pal"
 
     ; Vectors
     .org $FFFA

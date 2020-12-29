@@ -1,30 +1,34 @@
 SetArea:
 
     ; すべての行の分TILE_BUFFをタイルで埋めて描画する
+
+    ; 大量に描画するのでグラフィックをオフ
     lda soft2000
     and #$7F
     sta soft2000
-    sta $2000 ; 大量に描画するのでグラフィックをオフにする
     lda soft2001
     and #$E7
     sta soft2001
-    sta $2001
 
+    inc wait_nmi
+.Wn1:
+    lda wait_nmi
+    bne .Wn1
+
+    ; すべての行の分TILE_BUFFをタイルで埋めて描画する
     lda #$80
     sta stage_counter
     lda #$FF
     sta stage_counter+1
-.Loop:
+.DrawLoop:
     lda stage_counter+1
     sta fill_tile_cul+1
     sta fill_draw_cul+1
     lda stage_counter
     sta fill_tile_cul
     sta fill_draw_cul
-    jsr FillTileBuffRow
-    lda #$00
-    sta fill_draw_raw
-    jsr FillDrawBuffRow
+    jsr FillTileBuff
+    jsr DrawTileBuff
 
     lda stage_counter
     clc
@@ -35,13 +39,11 @@ SetArea:
     sta fill_draw_cul+1
     lda stage_counter
     sta fill_draw_cul
-    lda #$01
-    sta fill_draw_raw
-    jsr FillDrawBuffRow
+    jsr DrawTileBuff
 
     jsr DrawBG
     lda #$00
-    sta ppu_counter ; とりあえず0にするけど修正が必要かも
+    sta draw_buff_counter ; とりあえず0にするけど修正が必要かも
 
     lda stage_counter
     clc
@@ -53,11 +55,15 @@ SetArea:
     
     lda stage_counter+1
     cmp #$01
-    bne .Loop
+    bne .DrawLoop
     lda stage_counter
     cmp #$80
-    bne .Loop
+    bne .DrawLoop
 
+    lda #$00
+    sta DRAW_BUFF
+
+    lda $2002
     lda soft2000
     ora #$80
     sta soft2000
@@ -65,5 +71,10 @@ SetArea:
     lda soft2001
     ora #$18
     sta soft2001
+
+    inc wait_nmi
+.Wn2:
+    lda wait_nmi
+    bne .Wn2
 
     rts

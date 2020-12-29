@@ -1,16 +1,17 @@
 ;--------------------------------------------------
+; ベースとコマンドからオブジェクトを構成する．
 ; 入力したx位置の列のタイルでタイルバッファを埋める．
 ; x位置$10ごとに変わっていく．
 ;
 ; 入力
-; fill_tile_cul
-;  タイルを埋めたいところのx位置．
-; stage_base
-;  ベースのタイル
+;  fill_tile_cul
+;   タイルを埋めたいところのx位置．
+;  stage_base
+;   ベースのタイル
 
 
 
-TILE_BUFFER = $0500
+TILE_BUFF = $0500
 
 SIDE_CENTER = 0
 SIDE_RIGHT = 1
@@ -18,13 +19,9 @@ SIDE_LEFT = 2
 
 
 
-FillTileBuffRow:
+FillTileBuff:
 
-    lda fill_tile_cul+1
-    and #$01
-    sta area_page
-
-    ; 位置でパージを反転
+    ; 位置でページを反転
     lda fill_tile_cul+1
     and #$80
     bne .Side1
@@ -40,6 +37,8 @@ FillTileBuffRow:
     lda fill_tile_cul+1
     eor #$FF
     and #$7F
+    clc
+    adc #$01
     sta area_page
     jmp .SideEnd
 .Side2:
@@ -55,8 +54,8 @@ FillTileBuffRow:
 .SideEnd:
 
 
-    ; 入力から TILE_BUFFER の位置を求める．
-    ;  fill_tile_buff = (fill_tile_cul / 8 / 2 * 14) + TILE_BUFFER
+    ; 入力から TILE_BUFF の位置を求める．
+    ;  fill_tile_buff = (fill_tile_cul / 8 / 2 * 14) + TILE_BUFF
 
     lda fill_tile_cul
     and #$F0
@@ -93,7 +92,7 @@ FillTileBuffRow:
 
     lda fill_tile_buff+1
     clc
-    adc #HIGH(TILE_BUFFER)
+    adc #HIGH(TILE_BUFF)
     sta fill_tile_buff+1
 
     ; ベースで埋める

@@ -13,20 +13,20 @@
 ; stage_base
 ;  ステージの初期ベースに変更．
 
-TILE_BUFFER = $0500
+TILE_BUFF = $0500
 
 
 SetStage:
 
     ; ステージのロード
-    lda #$01 ; ステージ選択 後で入力に
+    lda stage ; ステージ選択 後で入力に
 
     asl a
     tax
-    lda stage, x
+    lda stageList, x
     sta stage_pointer
     inx
-    lda stage, x
+    lda stageList, x
     sta stage_pointer+1
 
     ; ステージデータのロード

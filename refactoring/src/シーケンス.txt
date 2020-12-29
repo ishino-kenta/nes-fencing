@@ -3,9 +3,13 @@
     コントローラ読み取り
     シーン分岐
 
-タイトルシーンテスト：
-    カメラ移動
-    SetStage:
-        FillTileBuffRow
-    シーン終了
+SetStage
+    stage_pointerをセット
+    >
+    ステージの情報をセット
+    area_pointerをセット
+    >
+    SetArea
 
+画面更新
+    

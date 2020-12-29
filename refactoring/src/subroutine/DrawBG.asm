@@ -16,8 +16,8 @@
 ;    "01". data from rom
 ;    "10". one data
 ;
-;  2. アドレス($2000~$23BF) low バイト
-;  3. アドレス high バイト
+;  2. アドレス($2000~$23BF) hihg バイト
+;  3. アドレス low バイト
 ;
 ;  ("data mode" が data from DRAW_BUFF のとき)
 ;  4~. タイルナンバー (length の分繰り返し)
@@ -76,10 +76,12 @@ DrawBG:
     jmp [tmp_drawbg+1]
 
 .TileBuf:
-    lda DRAW_BUFF, x
     inx
+    lda DRAW_BUFF, x
+    dex
     sta $2006
     lda DRAW_BUFF, x
+    inx
     inx
     sta $2006
     ldy #$00
@@ -93,10 +95,12 @@ DrawBG:
     jmp .Start
 
 .TileRom:
-    lda DRAW_BUFF, x
     inx
+    lda DRAW_BUFF, x
+    dex
     sta $2006
     lda DRAW_BUFF, x
+    inx
     inx
     sta $2006
     lda DRAW_BUFF, x
@@ -117,10 +121,10 @@ DrawBG:
 .AttrBuf:
     lda DRAW_BUFF, x
     inx
-    sta tmp_drawbg+1
+    sta tmp_drawbg+2
     lda DRAW_BUFF, x
     inx
-    sta tmp_drawbg+2
+    sta tmp_drawbg+1
     ldy #$00
 .Loop3:
     lda tmp_drawbg+1
@@ -142,10 +146,10 @@ DrawBG:
 .AttrRom:
     lda DRAW_BUFF, x
     inx
-    sta tmp_drawbg+1
+    sta tmp_drawbg+2
     lda DRAW_BUFF, x
     inx
-    sta tmp_drawbg+2
+    sta tmp_drawbg+1
     lda DRAW_BUFF, x
     inx
     sta tmp_drawbg+3
@@ -170,10 +174,12 @@ DrawBG:
     jmp .Start
 
 .TileOne:
-    lda DRAW_BUFF, x
     inx
+    lda DRAW_BUFF, x
+    dex
     sta $2006
     lda DRAW_BUFF, x
+    inx
     inx
     sta $2006
     ldy #$00

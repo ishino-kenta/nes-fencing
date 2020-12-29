@@ -18,7 +18,7 @@ NMI:
     bit $2002 ; スクロールいじる前に必要
     lda camera_x
     sta $2005
-    lda #$00
+    lda #$08 ; attrの調整のために+8
     sta $2005
 
     lda soft2000
