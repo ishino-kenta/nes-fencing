@@ -3,10 +3,48 @@ SetCamera:
     lda camera_x
     sta camera_x_pre
     lda camera_x+1
-    sta camera_x_pre+1   
+    sta camera_x_pre+1
+
+    ; カメラ位置 = ((player1_x + $8000) + (player1_x + $8000)) / 2 - $8000 - $80
+    ; 背景の中心が $0000 のため， +$8000 してから計算し， -$8000 する
 
     lda #$00
     sta camera_x
+    sta camera_x+1
+
+    lda player1_x
+    sta camera_x
+    lda player1_x+1
+    eor #$80
+    sta camera_x+1
+
+    lda player2_x
+    clc
+    adc camera_x
+    sta camera_x
+    lda player2_x+1
+    eor #$80
+    adc camera_x+1
+    sta camera_x+1
+
+    lda #$00
+    adc #$00
+    sta camera_tmp
+
+    lsr camera_tmp
+    ror camera_x+1
+    ror camera_x
+
+    lda camera_x+1
+    eor #$80
+    sta camera_x+1
+
+    lda camera_x
+    sec
+    sbc #$80
+    sta camera_x
+    lda camera_x+1
+    sbc #$00
     sta camera_x+1
 
     ; カメラによってメインスクリーン変更

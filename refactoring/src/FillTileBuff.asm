@@ -11,7 +11,7 @@
 
 
 
-TILE_BUFF = $0500
+TILE_BUFF = $0400
 
 SIDE_CENTER = 0
 SIDE_RIGHT = 1
@@ -180,7 +180,6 @@ FillTileBuff:
 .EndSetObjLoop:
 
     rts
-
 
     ; エリアコマンド
     ; yは呼び出し元から引継ぎ

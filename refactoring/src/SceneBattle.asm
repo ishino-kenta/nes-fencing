@@ -1,7 +1,122 @@
 SceneBattle:
 
-    jsr Move1
-    jsr Move2
+    ; 突き
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Stab
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Stab
+
+    ; プレイヤー移動
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Move
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Move
+    ; 壁の衝突判定
+    lda #COLLISION_RIGHT
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr CollisionDetection
+    lda #COLLISION_LEFT
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr CollisionDetection
+    lda #COLLISION_RIGHT
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr CollisionDetection
+    lda #COLLISION_LEFT
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr CollisionDetection
+
+    ; ジャンプ
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Jump
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Jump
+    ; 落下
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Fall
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Fall
+    ; 床の衝突判定
+    lda #COLLISION_BOTTOM
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr CollisionDetection
+    lda #COLLISION_BOTTOM
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr CollisionDetection
+    ; 天井の衝突判定
+    lda #COLLISION_TOP
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr CollisionDetection
+    lda #COLLISION_TOP
+    sta collisiondetection_direction
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr CollisionDetection
+
+    ; しゃがみ判定
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Crouch
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Crouch
 
     ; プレイヤーの向きを計算
     jsr SetPlayerDirection
@@ -12,17 +127,21 @@ SceneBattle:
     ; カメラ端の画面の更新
     jsr DrawCameraEdge
 
-    ; jsr Fall1
-    ; jsr Fall2
-
-    lda #PLAYER1
-    sta collisiondetection_player
-    lda #COLLISION_LEFT
-    sta collisiondetection_direction
-    jsr CollisionDetection
-
     ; プレイヤースプライト表示
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    lda #DRAW_PLAYER1
+    sta sprite_player
     jsr DrawPlayer
-
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    lda #DRAW_PLAYER2
+    sta sprite_player
+    jsr DrawPlayer
+    
     jmp MainLoop
 

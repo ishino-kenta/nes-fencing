@@ -1,56 +1,34 @@
-collisiondetection_x    .rs 3
-collisiondetection_y    .rs 1
-collisiondetection_addr    .rs 2
-collisiondetection_direction    .rs 1
-collisiondetection_player   .rs 1
-collisiondetection_end   .rs 1
-
 COLLISION_RIGHT = 0
 COLLISION_LEFT = 1
 COLLISION_TOP = 2
 COLLISION_BOTTOM = 3
 
-PLAYER1 = 0
-PLAYER2 = 1
+COLLISION_PLAYER1 = 0
+COLLISION_PLAYER2 = 1
 
 ;--------------------------------------------------
 ; 入力
-;  collisiondetection_x
-;  collisiondetection_y
+;  variable_addr
+;  collisiondetection_direction
 CollisionDetection:
 
-    ; collisiondetection_playerから変数を持ってきて
+    ; variable_addrから変数を持ってきて
     ; CollisionDetectionの引数とする
 
     ; 左下の判定
     lda #$00
     sta collisiondetection_end
 .Loop1:
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataX, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataX, x
-    sta collisiondetection_addr+1
-    ldy #$00
-    lda [collisiondetection_addr], y
+
+    ldy #PLAYER_X
+    lda [variable_addr], y
     sta collisiondetection_x
     iny
-    lda [collisiondetection_addr], y
+    lda [variable_addr], y
     sta collisiondetection_x+1
 
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataY, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataY, x
-    sta collisiondetection_addr+1
-    ldy #$00
-    lda [collisiondetection_addr], y
+    ldy #PLAYER_Y
+    lda [variable_addr], y
     sta collisiondetection_y
 
     lda collisiondetection_direction
@@ -81,31 +59,16 @@ CollisionDetection:
     lda #$00
     sta collisiondetection_end
 .Loop2:
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataX, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataX, x
-    sta collisiondetection_addr+1
-    ldy #$00
-    lda [collisiondetection_addr], y
+
+    ldy #PLAYER_X
+    lda [variable_addr], y
     sta collisiondetection_x
     iny
-    lda [collisiondetection_addr], y
+    lda [variable_addr], y
     sta collisiondetection_x+1
 
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataY, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataY, x
-    sta collisiondetection_addr+1
-    ldy #$00
-    lda [collisiondetection_addr], y
+    ldy #PLAYER_Y
+    lda [variable_addr], y
     sta collisiondetection_y
 
     lda collisiondetection_direction
@@ -227,17 +190,13 @@ CollisionDetectionOnce:
 
 collisionData:
     .dw C1,C2
-playerDataY:
-    .dw player1_y,player2_y
-playerDataX:
-    .dw player1_x,player2_x
-playerDataDirection:
-    .dw player1_direction,player2_direction
+
 directionOffcet:
     .dw $0006,$0000, $0006,$FFEA
     .dw $FFFA,$0000, $FFFA,$FFEA
     .dw $FFFA,$FFEA, $0006,$FFEA
     .dw $FFFA,$0000, $0006,$0000
+
 
 C1:
 
@@ -245,99 +204,84 @@ C1:
     cmp #COLLISION_TOP
     bne .NotTop
     ; 下に移動
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataY, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataY, x
-    sta collisiondetection_addr+1
-
-    ldy #$00
+    ldy #PLAYER_Y
     lda collisiondetection_y
     and #$0F
     eor #$FF
     clc
     adc #$01
     clc
-    adc [collisiondetection_addr], y
+    adc [variable_addr], y
     clc
     adc #$10
-    sta [collisiondetection_addr], y
+    sta [variable_addr], y
+    ; 落下リセット
+    ldy #PLAYER_FALL_INDEX
+    lda #$00
+    sta [variable_addr], y
+    ; ジャンプ終了
+    ldy #PLAYER_JUMP_SPEED
+    lda #$00
+    sta [variable_addr], y
 .NotTop:
 
     lda collisiondetection_direction
     cmp #COLLISION_BOTTOM
     bne .NotBottom
     ; 上に移動
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataY, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataY, x
-    sta collisiondetection_addr+1
-
-    ldy #$00
-    lda [collisiondetection_addr], y
-    and #$F0
+    ldy #PLAYER_Y
+    lda collisiondetection_y
+    and #$0F
+    eor #$FF
+    clc
+    adc #$01
+    clc
+    adc [variable_addr], y
     sec
     sbc #$01
-    sta [collisiondetection_addr], y
+    sta [variable_addr], y
+    ; 落下リセット
+    ldy #PLAYER_FALL_INDEX
+    lda #$00
+    sta [variable_addr], y
+    ; ジャンプ終了
+    ldy #PLAYER_JUMP_SPEED
+    lda #$00
+    sta [variable_addr], y
 .NotBottom:
 
     lda collisiondetection_direction
     cmp #COLLISION_RIGHT
     bne .NotRight
     ; 左に移動
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataX, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataX, x
-    sta collisiondetection_addr+1
-
-    ldy #$00
+    ldy #PLAYER_X
     lda collisiondetection_x+2
     and #$0F
     eor #$FF
     clc
     adc #$01
     clc
-    adc [collisiondetection_addr], y
+    adc [variable_addr], y
     sec
     sbc #$01
-    sta [collisiondetection_addr], y
+    sta [variable_addr], y
 .NotRight:
 
     lda collisiondetection_direction
     cmp #COLLISION_LEFT
     bne .NotLeft
     ; 右に移動
-    lda collisiondetection_player
-    asl a
-    tax
-    lda playerDataX, x
-    sta collisiondetection_addr
-    inx
-    lda playerDataX, x
-    sta collisiondetection_addr+1
-
-    ldy #$00
+    ldy #PLAYER_X
     lda collisiondetection_x+2
     and #$0F
     eor #$FF
     clc
     adc #$01
     clc
-    adc [collisiondetection_addr], y
+    adc [variable_addr], y
     clc
     adc #$10
-    sta [collisiondetection_addr], y
+    sta [variable_addr], y
 .NotLeft:
 
     rts

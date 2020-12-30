@@ -1,41 +1,29 @@
-Fall1:
+FALL_TABLE_MAX = $22
+
+;--------------------------------------------------
+; 入力
+;  variable_addr
+Fall:
 
     ; 落下処理
-    ldx player1_fall_index
+    ldy #PLAYER_FALL_INDEX
+    lda [variable_addr], y
+    tax
+    ldy #PLAYER_Y
     lda fallTable, x
     clc
-    adc player1_y
-    sta player1_y
+    adc [variable_addr], y
+    sta [variable_addr], y
 
-    lda player1_fall_index
+    ldy #PLAYER_FALL_INDEX
+    lda [variable_addr], y
     clc
     adc #$01
-    sta player1_fall_index
-    cmp #$23
+    sta [variable_addr], y
+    cmp #FALL_TABLE_MAX+1
     bne .End
-    lda #$22
-    sta player1_fall_index
-.End:
-
-    rts
-
-Fall2:
-
-    ; 落下処理
-    ldx player2_fall_index
-    lda fallTable, x
-    clc
-    adc player2_y
-    sta player2_y
-
-    lda player2_fall_index
-    clc
-    adc #$01
-    sta player2_fall_index
-    cmp #$23
-    bne .End
-    lda #$22
-    sta player2_fall_index
+    lda #FALL_TABLE_MAX
+    sta [variable_addr], y
 .End:
 
     rts

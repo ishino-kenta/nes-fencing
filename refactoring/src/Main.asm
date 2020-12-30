@@ -9,8 +9,6 @@ OAM = $0200
 DRAW_BUFF = $0300
 
     ; 変数
-    .rsset $0000
-
     .include "./valiable.asm"
 
     .bank 0
@@ -100,6 +98,9 @@ WatiNMI:
     .include "./DrawCameraEdge.asm"
     .include "./CollisionDetection.asm"
     .include "./SetPlayerDirection.asm"
+    .include "./Crouch.asm"
+    .include "./Jump.asm"
+    .include "./Stab.asm"
 
 
     .bank 1

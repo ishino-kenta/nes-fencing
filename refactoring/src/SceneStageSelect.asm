@@ -47,6 +47,15 @@ SceneStageSelect:
     lda #HIGH(SceneBattle)
     sta scene+1
 
+    lda #$80
+    sta player1_x
+    sta player2_x
+    sta player1_y
+    sta player2_y
+    lda #$00
+    sta player1_x+1
+    sta player2_x+1
+
     jmp .EndStart
 .NotStart:
 

@@ -13,7 +13,7 @@
 ; stage_base
 ;  ステージの初期ベースに変更．
 
-TILE_BUFF = $0500
+TILE_BUFF = $0400
 
 
 SetStage:
