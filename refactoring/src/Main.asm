@@ -101,6 +101,8 @@ WatiNMI:
     .include "./Crouch.asm"
     .include "./Jump.asm"
     .include "./Stab.asm"
+    .include "./CollisionDetectionSword.asm"
+    .include "./ChangePosture.asm"
 
 
     .bank 1

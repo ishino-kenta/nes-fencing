@@ -12,6 +12,20 @@ SceneBattle:
     sta variable_addr+1
     jsr Stab
 
+    ; しゃがみ判定
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr Crouch
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr Crouch
+
+    ; 剣の衝突
+    jsr CollisionDetectionSword
     ; プレイヤー移動
     lda #LOW(VARIABLE_PLAYER1)
     sta variable_addr
@@ -106,17 +120,17 @@ SceneBattle:
     sta variable_addr+1
     jsr CollisionDetection
 
-    ; しゃがみ判定
+    ; 構え変更
     lda #LOW(VARIABLE_PLAYER1)
     sta variable_addr
     lda #HIGH(VARIABLE_PLAYER1)
     sta variable_addr+1
-    jsr Crouch
+    jsr ChangePosture
     lda #LOW(VARIABLE_PLAYER2)
     sta variable_addr
     lda #HIGH(VARIABLE_PLAYER2)
     sta variable_addr+1
-    jsr Crouch
+    jsr ChangePosture
 
     ; プレイヤーの向きを計算
     jsr SetPlayerDirection

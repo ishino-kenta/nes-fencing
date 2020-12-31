@@ -26,12 +26,19 @@ Stab:
     and [variable_addr], y
     and #PAD_B
     beq .EndStab
+    ; 突き中は上書きしない
     ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
     bne .EndStab
+    ; 空中では突きをしない
     ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
     bne .EndStab
+    ; しゃがみ中は突きをしない
+    ldy #PLAYER_CROUCH
+    lda [variable_addr], y
+    cmp #CROUCH
+    beq .EndStab
     ldy #PLAYER_STAB_INDEX
     lda #$01
     sta [variable_addr], y

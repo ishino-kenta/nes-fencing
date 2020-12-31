@@ -36,10 +36,11 @@ DrawPlayer:
     ; しゃがみ
     ldy #PLAYER_CROUCH
     lda [variable_addr], y
-    beq .NotCrouch
+    cmp #CROUCH
+    bne .NotCrouch
     txa
     clc
-    adc #$10
+    adc #$20
     tax
     jmp .EndTile
 .NotCrouch:
@@ -49,17 +50,18 @@ DrawPlayer:
     beq .NotJump
     txa
     clc
-    adc #$14
+    adc #$24
     tax
     jmp .EndTile
 .NotJump:
+
     ; 突き
     ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
     beq .NotStab
     txa
     clc
-    adc #$18
+    adc #$28
     tax
     ; 突きの時x位置変更
     ldy #PLAYER_DIRECTION
@@ -73,7 +75,7 @@ DrawPlayer:
     lda sprite_x+1
     adc #$00
     sta sprite_x+1
-    jmp .EndStab
+    jmp .Posture
 .Stab:
     lda sprite_x
     sec
@@ -82,9 +84,9 @@ DrawPlayer:
     lda sprite_x+1
     sbc #$00
     sta sprite_x+1
-.EndStab:
-    jmp .EndTile
+    jmp .Posture
 .NotStab:
+
     ; 走り
     ldy #PLAYER_SPEED_INDEX
     lda [variable_addr], y
@@ -97,13 +99,13 @@ DrawPlayer:
     beq .Run
     txa
     clc
-    adc #$04
+    adc #$0C
     tax
     jmp .EndTile
 .Run:
     txa
     clc
-    adc #$08
+    adc #$10
     tax
     jmp .EndTile
 .NotRun:
@@ -116,10 +118,20 @@ DrawPlayer:
     bcs .NotStep
     txa
     clc
-    adc #$0C
+    adc #$14
     tax
-    jmp .EndTile
+    jmp .Posture
 .NotStep:
+.Posture:
+    ; 構えの高さ 通常時,突き時,ステップ時のみ
+    ldy #PLAYER_POSTURE
+    txa
+    clc
+    adc [variable_addr],y
+    adc [variable_addr],y
+    adc [variable_addr],y
+    adc [variable_addr],y
+    tax
 .EndTile:
     lda spriteTile, x
     sta sprite_tile
@@ -218,7 +230,8 @@ DrawPlayer:
     ; しゃがみ中は非表示
     ldy #PLAYER_CROUCH
     lda [variable_addr], y
-    bne .NotDrawSword
+    cmp #CROUCH
+    beq .NotDrawSword
     ; ジャンプ中は非表示
     ldy #PLAYER_JUMP_SPEED
     lda [variable_addr], y
@@ -238,7 +251,16 @@ DrawPlayer:
     ldy #PLAYER_DIRECTION
     lda [variable_addr], y
     asl a
-    tay
+    sta sprite_tmp
+    ldy #PLAYER_STAB_INDEX
+    lda [variable_addr], y
+    beq .NotStabSword
+    lda sprite_tmp
+    clc
+    adc #$04
+    sta sprite_tmp
+.NotStabSword:
+    ldy sprite_tmp
     lda sprite_x
     clc
     adc swordX, y
@@ -339,7 +361,15 @@ Hide:
 ; 入力: sprite_tmp(0,1)
 ShowSword:
 
-    lda #$F7
+    ldy #PLAYER_POSTURE
+    lda [variable_addr],y
+    asl a
+    asl a
+    eor #$FF
+    clc
+    adc #$01
+    clc
+    adc #$FB
     clc
     adc sprite_y
     sta OAM, x
@@ -388,19 +418,39 @@ HideSword:
 
 
 spriteTile:
-    .dw spriteRight,spriteLeft
+    .dw spriteLowRight,spriteLowLeft
+    .dw spriteMidRight,spriteMidLeft
+    .dw spriteHighRight,spriteHighLeft
+
     .dw spriteRun1Right,spriteRun1Left
     .dw spriteRun2Right,spriteRun2Left
-    .dw spriteStepRight,spriteStepLeft
+
+    .dw spriteStepLowRight,spriteStepLowLeft
+    .dw spriteStepMidRight,spriteStepMidLeft
+    .dw spriteStepHighRight,spriteStepHighLeft
+
     .dw spriteCrouchRight,spriteCrouchLeft
+
     .dw spriteJumpRight,spriteJumpLeft
-    .dw spriteStabRight,spriteStabLeft
+
+    .dw spriteStabLowRight,spriteStabLowLeft
+    .dw spriteStabMidRight,spriteStabMidLeft
+    .dw spriteStabHighRight,spriteStabHighLeft
 
 
-spriteRight:
+spriteMidRight:
     .db $03,$13,$23,$04,$14,$24,$05,$15,$25
-spriteLeft:
+spriteMidLeft:
     .db $05,$15,$25,$04,$14,$24,$03,$13,$23
+spriteLowRight:
+    .db $43,$53,$63,$44,$54,$64,$45,$55,$65
+spriteLowLeft:
+    .db $45,$55,$65,$44,$54,$64,$43,$53,$63
+spriteHighRight:
+    .db $83,$93,$A3,$84,$94,$A4,$85,$95,$A5
+spriteHighLeft:
+    .db $85,$95,$A5,$84,$94,$A4,$83,$93,$A3
+
 spriteRun1Right:
     .db $49,$59,$69,$4A,$5A,$6A,$4B,$5B,$6B
 spriteRun1Left:
@@ -409,22 +459,42 @@ spriteRun2Right:
     .db $4C,$5C,$6C,$4D,$5D,$6D,$4E,$5E,$6E
 spriteRun2Left:
     .db $4E,$5E,$6E,$4D,$5D,$6D,$4C,$5C,$6C
-spriteStepRight:
+
+spriteStepMidRight:
     .db $06,$16,$26,$07,$17,$27,$08,$18,$28
-spriteStepLeft:
+spriteStepMidLeft:
     .db $08,$18,$28,$07,$17,$27,$06,$16,$26
-spriteCrouchRight:
+spriteStepLowRight:
     .db $46,$56,$66,$47,$57,$67,$48,$58,$68
-spriteCrouchLeft:
+spriteStepLowLeft:
     .db $48,$58,$68,$47,$57,$67,$46,$56,$66
-spriteJumpRight:
+spriteStepHighRight:
     .db $86,$96,$A6,$87,$97,$A7,$88,$98,$A8
-spriteJumpLeft:
+spriteStepHighLeft:
     .db $88,$98,$A8,$87,$97,$A7,$86,$96,$A6
-spriteStabRight:
+
+spriteCrouchRight:
+    .db $8C,$9C,$AC,$8D,$9D,$AD,$8E,$9E,$AE
+spriteCrouchLeft:
+    .db $8E,$9E,$AE,$8D,$9D,$AD,$8C,$9C,$AC
+
+spriteJumpRight:
+    .db $89,$99,$A9,$8A,$9A,$AA,$8B,$9B,$AB
+spriteJumpLeft:
+    .db $8B,$9B,$AB,$8A,$9A,$AA,$89,$99,$A9
+
+spriteStabMidRight:
     .db $00,$10,$20,$01,$11,$21,$02,$12,$22
-spriteStabLeft:
+spriteStabMidLeft:
     .db $02,$12,$22,$01,$11,$21,$00,$10,$20
+spriteStabLowRight:
+    .db $40,$50,$60,$41,$51,$61,$42,$52,$62
+spriteStabLowLeft:
+    .db $42,$52,$62,$41,$51,$61,$40,$50,$60
+spriteStabHighRight:
+    .db $80,$90,$A0,$81,$91,$A1,$82,$92,$A2
+spriteStabHighLeft:
+    .db $82,$92,$A2,$81,$91,$A1,$80,$90,$A0
 
 spriteY:
     .db $F0,$F8,$00,$F0,$F8,$00,$F0,$F8,$00
@@ -433,6 +503,9 @@ centerX:
     .db $F4,$FF, $F5,$FF
 
 swordX:
+    ; 通常
     .db $06,$00, $E2,$FF
+    ; 突き
+    .db $08,$00, $E0,$FF
 swordY:
     .db $F4,$F0,$EC ; 下,中,上

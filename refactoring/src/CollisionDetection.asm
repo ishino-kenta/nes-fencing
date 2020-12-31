@@ -31,23 +31,51 @@ CollisionDetection:
     lda [variable_addr], y
     sta collisiondetection_y
 
+    ; ヒットボックスのオフセット設定
     lda collisiondetection_direction
     asl a
     asl a
     asl a
     tax
+    ldy #PLAYER_STAB_INDEX
+    lda [variable_addr], y
+    beq .NextHitbox1
+    txa
+    clc
+    adc #$20
+    tax
+    ldy #PLAYER_DIRECTION
+    lda [variable_addr], y
+    cmp #DIRECTION_LEFT
+    bne .EndHitbox1
+    txa
+    clc
+    adc #$20
+    tax
+    jmp .EndHitbox1
+.NextHitbox1:
+    ldy #PLAYER_CROUCH
+    lda [variable_addr], y
+    cmp #CROUCH
+    bne .EndHitbox1
+    txa
+    clc
+    adc #$60
+    tax
+.EndHitbox1:
+
     lda collisiondetection_x
     clc
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_x
     inx
     lda collisiondetection_x+1
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_x+1
     inx
     lda collisiondetection_y
     clc
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_y
 
     jsr CollisionDetectionOnce
@@ -71,27 +99,53 @@ CollisionDetection:
     lda [variable_addr], y
     sta collisiondetection_y
 
+    ; ヒットボックスのオフセット設定
     lda collisiondetection_direction
     asl a
     asl a
     asl a
+    clc
+    adc #$04
     tax
-    inx
-    inx
-    inx
-    inx
+    ldy #PLAYER_STAB_INDEX
+    lda [variable_addr], y
+    beq .NextHitbox2
+    txa
+    clc
+    adc #$20
+    tax
+    ldy #PLAYER_DIRECTION
+    lda [variable_addr], y
+    cmp #DIRECTION_LEFT
+    bne .EndHitbox2
+    txa
+    clc
+    adc #$20
+    tax
+    jmp .EndHitbox2
+.NextHitbox2:
+    ldy #PLAYER_CROUCH
+    lda [variable_addr], y
+    cmp #CROUCH
+    bne .EndHitbox2
+    txa
+    clc
+    adc #$60
+    tax
+.EndHitbox2:
+
     lda collisiondetection_x
     clc
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_x
     inx
     lda collisiondetection_x+1
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_x+1
     inx
     lda collisiondetection_y
     clc
-    adc directionOffcet, x
+    adc hitboxOffcet, x
     sta collisiondetection_y
 
     jsr CollisionDetectionOnce
@@ -191,12 +245,27 @@ CollisionDetectionOnce:
 collisionData:
     .dw C1,C2
 
-directionOffcet:
-    .dw $0006,$0000, $0006,$FFEA
-    .dw $FFFA,$0000, $FFFA,$FFEA
-    .dw $FFFA,$FFEA, $0006,$FFEA
+hitboxOffcet: ; x,y
+    ; 普通
+    .dw $0006,$0000, $0006,$FFEA ; 右
+    .dw $FFFA,$0000, $FFFA,$FFEA ; 左
+    .dw $FFFA,$FFEA, $0006,$FFEA ; 上
+    .dw $FFFA,$0000, $0006,$0000 ; 下
+    ; 突き 右
+    .dw $000E,$0000, $000E,$FFEF
+    .dw $FFFC,$0000, $FFFC,$FFEF
+    .dw $FFFC,$FFEF, $000E,$FFEF
+    .dw $FFFC,$0000, $000E,$0000
+    ; 突き 左
+    .dw $0004,$0000, $0004,$FFEF
+    .dw $FFF2,$0000, $FFF2,$FFEF
+    .dw $FFF2,$FFEF, $0004,$FFEF
+    .dw $FFF2,$0000, $0004,$0000
+    ; しゃがみ
+    .dw $0006,$0000, $0006,$FFF6
+    .dw $FFFA,$0000, $FFFA,$FFF6
+    .dw $FFFA,$FFF6, $0006,$FFF6
     .dw $FFFA,$0000, $0006,$0000
-
 
 C1:
 

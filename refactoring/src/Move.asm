@@ -131,8 +131,22 @@ Move:
 ;     adc #$01
 ;     sta [variable_addr], y
 ; .NotDown:
+    ldy #PAD
+    lda [variable_addr], y
+    iny
+    eor [variable_addr], y
+    dey
+    and [variable_addr], y
+    and #PAD_START
+    beq .NotStart
+    ldy #PLAYER_X
+    lda [variable_addr], y
+    clc
+    adc #$01
+    sta [variable_addr], y
+.NotStart:
 
     rts
 
 speedTable:
-    .db $01,$02,$03,$02,$01,$00,$00,$00,$00,$00,$00,$02,$03
+    .db $01,$01,$02,$01,$01,$00,$00,$00,$00,$00,$00,$02,$03

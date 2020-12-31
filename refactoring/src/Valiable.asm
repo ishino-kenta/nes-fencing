@@ -1,6 +1,6 @@
 
 VARIABLE_PLAYER1 = $0004
-VARIABLE_PLAYER2 = VARIABLE_PLAYER1 + $0B
+VARIABLE_PLAYER2 = VARIABLE_PLAYER1 + $0C
 
 PAD                 = $00
 PAD_PRE             = $01
@@ -12,6 +12,7 @@ PLAYER_SPEED_INDEX  = $07
 PLAYER_CROUCH       = $08
 PLAYER_JUMP_SPEED   = $09
 PLAYER_STAB_INDEX   = $0A
+PLAYER_POSTURE   = $0B
 
     .rsset $0000
 
@@ -28,6 +29,7 @@ player1_speed_index .rs 1
 player1_crouch .rs 1
 player1_jump_speed  .rs 1
 player1_stab_index  .rs 1
+player1_posture  .rs 1
 
 ; player2
 pad2    .rs 1
@@ -40,6 +42,7 @@ player2_speed_index .rs 1
 player2_crouch .rs 1
 player2_jump_speed  .rs 1
 player2_stab_index  .rs 1
+player2_posture  .rs 1
 
 variable_addr   .rs 2
 

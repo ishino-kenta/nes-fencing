@@ -12,14 +12,19 @@ Jump:
     and [variable_addr], y
     and #PAD_A
     beq .EndJump
-
+    ; 空中ジャンプはなし
     ldy #PLAYER_FALL_INDEX
+    lda [variable_addr], y
+    bne .EndJump
+    ; 攻撃中はジャンプしない
+    ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
     bne .EndJump
 
     ldy #PLAYER_CROUCH
     lda [variable_addr], y
-    beq .NotCrouch
+    cmp #CROUCH
+    bne .NotCrouch
 
     ldy #PLAYER_JUMP_SPEED
     lda #$06
