@@ -1,9 +1,40 @@
+camera_direction_pre    .rs 1
+
 SetCamera:
 
     lda camera_x
     sta camera_x_pre
     lda camera_x+1
     sta camera_x_pre+1
+
+    lda leadplayer
+    cmp #LEAD_VACANT
+    bne .Do
+    jmp .End
+.Do:
+
+    lda player2_dead
+    beq .Alive1
+    lda player1_x
+    sec
+    sbc #$40
+    sta camera_x
+    lda player1_x+1
+    sbc #$00
+    sta camera_x+1
+    jmp .EndSet
+.Alive1:
+    lda player1_dead
+    beq .Alive2
+    lda player2_x
+    sec
+    sbc #$C0
+    sta camera_x
+    lda player2_x+1
+    sbc #$00
+    sta camera_x+1
+    jmp .EndSet
+.Alive2:
 
     ; カメラ位置 = ((player1_x + $8000) + (player1_x + $8000)) / 2 - $8000 - $80
     ; 背景の中心が $0000 のため， +$8000 してから計算し， -$8000 する
@@ -46,6 +77,46 @@ SetCamera:
     lda camera_x+1
     sbc #$00
     sta camera_x+1
+.EndSet:
+
+    ; カメラの移動量計算
+    lda camera_x
+    sec
+    sbc camera_x_pre
+    sta camera_x
+    lda camera_x+1
+    sbc camera_x_pre+1
+    sta camera_x+1
+
+    ; 1フレームでのカメラの移動量を7に制限
+    lda camera_x+1
+    and #$80
+    bne .Neg
+
+    lda camera_x
+    and #$F8
+    beq .EndLimit
+    lda #$07
+    sta camera_x
+    jmp .EndLimit
+
+.Neg:
+    lda camera_x
+    eor #$FF
+    and #$F8
+    beq .EndLimit
+    lda #$F9
+    sta camera_x
+.EndLimit:
+
+    ; カメラを移動
+    lda camera_x_pre
+    clc
+    adc camera_x
+    sta camera_x
+    lda camera_x_pre+1
+    adc camera_x+1
+    sta camera_x+1
 
     ; カメラによってメインスクリーン変更
     lda camera_x+1
@@ -55,5 +126,7 @@ SetCamera:
     and #$FC
     ora camera_tmp
     sta soft2000
+
+.End:
 
     rts

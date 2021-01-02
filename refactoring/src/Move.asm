@@ -14,8 +14,13 @@ Move:
     ; 突き中は移動しない
     ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
-    beq .Move
-    jmp .End
+    bne .Not
+    ldy #PLAYER_DEAD
+    lda [variable_addr], y
+    bne .Not
+    jmp .Move
+.Not:
+    jmp .Stay
 .Move:
 
     ; 右
@@ -23,8 +28,8 @@ Move:
     lda [variable_addr], y
     and #PAD_RIGHT
     beq .NotRight
-    ; ジャンプ中はマックススピードから
-    ldy #PLAYER_JUMP_SPEED
+    ; 空中ではマックススピードから
+    ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
     beq .NotJumpRight
     ldy #PLAYER_SPEED_INDEX
@@ -63,8 +68,8 @@ Move:
     lda [variable_addr], y
     and #PAD_LEFT
     beq .NotLeft
-    ; ジャンプ中はマックススピードから
-    ldy #PLAYER_JUMP_SPEED
+    ; 空中ではマックススピードから
+    ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
     beq .NotJumpLeft
     ldy #PLAYER_SPEED_INDEX
@@ -137,14 +142,16 @@ Move:
     eor [variable_addr], y
     dey
     and [variable_addr], y
-    and #PAD_START
-    beq .NotStart
+    and #PAD_SELECT
+    beq .NotSelect
     ldy #PLAYER_X
     lda [variable_addr], y
+    ; sec
+    ; sbc #$01
     clc
     adc #$01
     sta [variable_addr], y
-.NotStart:
+.NotSelect:
 
     rts
 

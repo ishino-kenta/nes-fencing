@@ -4,6 +4,16 @@ SetPlayerDirection:
 
     ; プレイヤーの向きを位置関係によって変更
 
+    ; 死亡中は相手に向かない
+    lda player1_dead
+    bne .Dead
+    lda player2_dead
+    bne .Dead
+    jmp .Do
+.Dead:
+    jmp .Skip
+.Do:
+
     ; 背景の中心が$0000のため， + $8000してから比較
     lda player1_x+1
     eor #$80
@@ -53,6 +63,7 @@ SetPlayerDirection:
     lda player2_x+1
     eor #$80
     sta player2_x+1
+.Skip:
 
     ; 走っている場合向きを移動方向にする
     ; 突き中は向きを変えない

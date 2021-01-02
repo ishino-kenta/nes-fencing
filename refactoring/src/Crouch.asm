@@ -14,10 +14,10 @@ Crouch:
     ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
     bne .NotCrouch
-    ; ジャンプ中はしゃがまない
-    ldy #PLAYER_JUMP_SPEED
+    ; 空中では処理しない
+    ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
-    bne .NotCrouch
+    bne .EndCrouch
     ldy #PLAYER_CROUCH
     lda [variable_addr], y
     clc

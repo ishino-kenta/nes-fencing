@@ -103,6 +103,9 @@ WatiNMI:
     .include "./Stab.asm"
     .include "./CollisionDetectionSword.asm"
     .include "./ChangePosture.asm"
+    .include "./Pause.asm"
+    .include "./Hit.asm"
+    .include "./Reborn.asm"
 
 
     .bank 1

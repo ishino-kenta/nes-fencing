@@ -20,6 +20,10 @@ Jump:
     ldy #PLAYER_STAB_INDEX
     lda [variable_addr], y
     bne .EndJump
+    ; 死亡中はジャンプしない
+    ldy #PLAYER_DEAD
+    lda [variable_addr], y
+    bne .EndJump
 
     ldy #PLAYER_CROUCH
     lda [variable_addr], y

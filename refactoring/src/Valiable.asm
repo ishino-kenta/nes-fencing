@@ -1,6 +1,6 @@
 
 VARIABLE_PLAYER1 = $0004
-VARIABLE_PLAYER2 = VARIABLE_PLAYER1 + $0C
+VARIABLE_PLAYER2 = VARIABLE_PLAYER1 + $11
 
 PAD                 = $00
 PAD_PRE             = $01
@@ -13,6 +13,10 @@ PLAYER_CROUCH       = $08
 PLAYER_JUMP_SPEED   = $09
 PLAYER_STAB_INDEX   = $0A
 PLAYER_POSTURE   = $0B
+PLAYER_SWORD_X   = $0C
+PLAYER_SWORD_OFFSET   = $0E
+PLAYER_DEAD   = $0F
+PLAYER_DEAD_PRE   = $10
 
     .rsset $0000
 
@@ -30,6 +34,10 @@ player1_crouch .rs 1
 player1_jump_speed  .rs 1
 player1_stab_index  .rs 1
 player1_posture  .rs 1
+player1_sword_x .rs 2
+player1_sword_offset    .rs 1
+player1_dead    .rs 1
+player1_dead_pre    .rs 1
 
 ; player2
 pad2    .rs 1
@@ -43,8 +51,12 @@ player2_crouch .rs 1
 player2_jump_speed  .rs 1
 player2_stab_index  .rs 1
 player2_posture  .rs 1
+player2_sword_x .rs 2
+player2_sword_offset    .rs 1
+player2_dead    .rs 1
+player2_dead_pre    .rs 1
 
-variable_addr   .rs 2
+variable_addr   .rs 4
 
 source_addr .rs 2
 
@@ -104,5 +116,11 @@ collisiondetection_y    .rs 1
 collisiondetection_direction    .rs 1
 collisiondetection_end   .rs 1
 collisiondetection_addr .rs 2
+collisiondetection_hitbox_offset .rs 1
+collisiondetection_tmp .rs 1
 
 clock   .rs 1
+
+pause   .rs 1
+
+leadplayer  .rs 1

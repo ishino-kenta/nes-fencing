@@ -1,5 +1,14 @@
 SceneBattle:
 
+    jsr Pause
+
+    lda pause
+    beq .Do
+    jmp .Pause
+.Do:
+
+    jsr Reborn
+
     ; 突き
     lda #LOW(VARIABLE_PLAYER1)
     sta variable_addr
@@ -23,6 +32,18 @@ SceneBattle:
     lda #HIGH(VARIABLE_PLAYER2)
     sta variable_addr+1
     jsr Crouch
+
+    ; 構え変更
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+1
+    jsr ChangePosture
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+1
+    jsr ChangePosture
 
     ; 剣の衝突
     jsr CollisionDetectionSword
@@ -120,17 +141,26 @@ SceneBattle:
     sta variable_addr+1
     jsr CollisionDetection
 
-    ; 構え変更
+    ; 剣のヒット
     lda #LOW(VARIABLE_PLAYER1)
     sta variable_addr
     lda #HIGH(VARIABLE_PLAYER1)
     sta variable_addr+1
-    jsr ChangePosture
+    lda #LOW(VARIABLE_PLAYER2)
+    sta variable_addr+2
+    lda #HIGH(VARIABLE_PLAYER2)
+    sta variable_addr+3
+    jsr Hit
     lda #LOW(VARIABLE_PLAYER2)
     sta variable_addr
     lda #HIGH(VARIABLE_PLAYER2)
     sta variable_addr+1
-    jsr ChangePosture
+    lda #LOW(VARIABLE_PLAYER1)
+    sta variable_addr+2
+    lda #HIGH(VARIABLE_PLAYER1)
+    sta variable_addr+3
+    jsr Hit
+    jsr HitCheck
 
     ; プレイヤーの向きを計算
     jsr SetPlayerDirection
@@ -157,5 +187,7 @@ SceneBattle:
     sta sprite_player
     jsr DrawPlayer
     
+.Pause:
+
     jmp MainLoop
 

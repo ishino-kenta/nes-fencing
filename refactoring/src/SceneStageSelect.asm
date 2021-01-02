@@ -47,9 +47,11 @@ SceneStageSelect:
     lda #HIGH(SceneBattle)
     sta scene+1
 
-    lda #$80
-    sta player1_x
+    lda #$B0
     sta player2_x
+    lda #$50
+    sta player1_x
+    lda #$A0
     sta player1_y
     sta player2_y
     lda #$00

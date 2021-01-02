@@ -2,6 +2,7 @@ DrawCameraEdge:
 
     ; カメラの移動方向判定
     ; 左右の更新
+
     lda camera_x+1
     cmp camera_x_pre+1
     beq .Next
@@ -12,9 +13,10 @@ DrawCameraEdge:
     cmp camera_x_pre
     bcc .Left
 .Right:
+
     lda camera_x
     clc
-    adc #$7F
+    adc #$78
     sta fill_tile_cul
     sta fill_draw_cul
     lda camera_x+1
@@ -25,9 +27,10 @@ DrawCameraEdge:
     jsr DrawTileBuff
     jmp .End
 .Left:
+
     lda camera_x
     sec
-    sbc #$7F
+    sbc #$79
     sta fill_tile_cul
     sta fill_draw_cul
     lda camera_x+1

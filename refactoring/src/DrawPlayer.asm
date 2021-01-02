@@ -33,6 +33,16 @@ DrawPlayer:
     lda [variable_addr], y
     asl a
     tax
+    ; 死亡
+    ldy #PLAYER_DEAD
+    lda [variable_addr], y
+    beq .NotDead
+    txa
+    clc
+    adc #$34
+    tax
+    jmp .EndTile
+.NotDead:
     ; しゃがみ
     ldy #PLAYER_CROUCH
     lda [variable_addr], y
@@ -44,8 +54,8 @@ DrawPlayer:
     tax
     jmp .EndTile
 .NotCrouch:
-    ; ジャンプ
-    ldy #PLAYER_JUMP_SPEED
+    ; 空中
+    ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
     beq .NotJump
     txa
@@ -232,8 +242,12 @@ DrawPlayer:
     lda [variable_addr], y
     cmp #CROUCH
     beq .NotDrawSword
-    ; ジャンプ中は非表示
-    ldy #PLAYER_JUMP_SPEED
+    ; 空中では非表示
+    ldy #PLAYER_FALL_INDEX
+    lda [variable_addr], y
+    bne .NotDrawSword
+    ; 死亡中は非表示
+    ldy #PLAYER_DEAD
     lda [variable_addr], y
     bne .NotDrawSword
     ; 毎フレームプレイヤーを切り替える
@@ -437,6 +451,8 @@ spriteTile:
     .dw spriteStabMidRight,spriteStabMidLeft
     .dw spriteStabHighRight,spriteStabHighLeft
 
+    .dw spriteDeadRight,spriteDeadLeft
+
 
 spriteMidRight:
     .db $03,$13,$23,$04,$14,$24,$05,$15,$25
@@ -495,6 +511,11 @@ spriteStabHighRight:
     .db $80,$90,$A0,$81,$91,$A1,$82,$92,$A2
 spriteStabHighLeft:
     .db $82,$92,$A2,$81,$91,$A1,$80,$90,$A0
+
+spriteDeadRight:
+    .db $0F,$0F,$CC,$0F,$0F,$CD,$0F,$0F,$CE
+spriteDeadLeft:
+    .db $0F,$0F,$CE,$0F,$0F,$CD,$0F,$0F,$CC
 
 spriteY:
     .db $F0,$F8,$00,$F0,$F8,$00,$F0,$F8,$00

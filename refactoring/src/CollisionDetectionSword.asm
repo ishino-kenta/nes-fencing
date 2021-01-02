@@ -1,7 +1,5 @@
-player1_sword_x .rs 2
-player2_sword_x .rs 2
-player1_sword_offset    .rs 1
-player2_sword_offset    .rs 1
+
+sword_tmp .rs 1
 
 CollisionDetectionSword:
 
@@ -20,17 +18,44 @@ CollisionDetectionSword:
 .Next2:
     ; しゃがみ中は判定しない
     lda player1_crouch
-    bne .Not
+    cmp #CROUCH
+    beq .Not
     lda player2_crouch
+    cmp #CROUCH
+    beq .Not
+    ; 空中では判定しない
+    lda player1_fall_index
     bne .Not
-    ; ジャンプ中は判定しない
-    lda player1_jump_speed
+    lda player2_fall_index
     bne .Not
-    lda player2_jump_speed
+    ; 死亡中は判定しない
+    lda player1_dead
     bne .Not
-    ; 構えた位置が違うなら判定しない
+    lda player2_dead
+    bne .Not
+    ; 剣の高さが違うなら判定しない
     lda player1_posture
-    cmp player2_posture
+    asl a
+    asl a
+    eor #$FF
+    clc
+    adc #$01
+    clc
+    adc #$FB
+    clc
+    adc player1_y
+    sta sword_tmp
+    lda player2_posture
+    asl a
+    asl a
+    eor #$FF
+    clc
+    adc #$01
+    clc
+    adc #$FB
+    clc
+    adc player2_y
+    cmp sword_tmp
     bne .Not
     jmp .Do
 .Not:
@@ -68,6 +93,8 @@ CollisionDetectionSword:
     inx
     lda player1_x+1
     adc swordOffcet, x
+    clc
+    adc #$80 ; 中心を$8000にするために補正
     sta player1_sword_x+1
 
     ldx player2_sword_offset
@@ -78,6 +105,8 @@ CollisionDetectionSword:
     inx
     lda player2_x+1
     adc swordOffcet, x
+    clc
+    adc #$80 ; 中心を$8000にするために補正
     sta player2_sword_x+1
 
     ; プレイヤー1の剣の左端か右端が
@@ -125,6 +154,9 @@ CollisionDetectionSword:
     jmp .EndL2L1R2
 .L2L1R2:
     ; 左1 <= 右2
+    ; 衝突
+
+    ; 交差している長さから移動距離を計算
     lda player2_sword_x
     sec
     sbc player1_sword_x
@@ -138,6 +170,31 @@ CollisionDetectionSword:
     clc
     adc #$04
     sta player1_sword_x
+
+    ; 向きによって移動方向を決定
+    lda player1_direction
+    cmp #DIRECTION_LEFT
+    beq .Move1
+
+    lda player1_x
+    sec
+    sbc player1_sword_x
+    sta player1_x
+    lda player1_x+1
+    sbc #$00
+    sta player1_x+1
+
+    lda player2_x
+    clc
+    adc player1_sword_x
+    sta player2_x
+    lda player2_x+1
+    adc #$00
+    sta player2_x+1
+
+    jmp .End
+
+.Move1:
 
     lda player1_x
     clc
@@ -156,9 +213,10 @@ CollisionDetectionSword:
     sta player2_x+1
 
     jmp .End
+
 .EndL2L1R2:
 
-    ; 左2 <= 左2 <= 右2
+    ; 左2 <= 右1 <= 右2
 
     lda player1_sword_x
     clc
@@ -178,7 +236,7 @@ CollisionDetectionSword:
     cmp player2_sword_x
     bcc .NotL2R1R2
 .L2R1:
-    ; 左2 <= 左1
+    ; 左2 <= 右1
     lda player2_sword_x
     clc
     adc #$0F
@@ -200,8 +258,8 @@ CollisionDetectionSword:
 .NotL2R1R2:
     jmp .End
 .L2R1R2:
-    ; 左1 <= 右2
-
+    ; 右1 <= 右2
+    ; 衝突
     lda player2_sword_x
     sec
     sbc #$0F
@@ -210,6 +268,7 @@ CollisionDetectionSword:
     sbc #$00
     sta player2_sword_x+1
 
+    ; 交差している長さから移動距離を計算
     lda player1_sword_x
     sec
     sbc player2_sword_x
@@ -223,6 +282,11 @@ CollisionDetectionSword:
     clc
     adc #$04
     sta player2_sword_x
+
+    ; 向きによって移動方向を決定
+    lda player1_direction
+    cmp #DIRECTION_LEFT
+    beq .Move2
 
     lda player2_x
     clc
@@ -240,6 +304,27 @@ CollisionDetectionSword:
     sbc #$00
     sta player1_x+1
 
+    jmp .End
+
+.Move2:
+
+    lda player2_x
+    sec
+    sbc player2_sword_x
+    sta player2_x
+    lda player2_x+1
+    sbc #$00
+    sta player2_x+1
+
+    lda player1_x
+    clc
+    adc player2_sword_x
+    sta player1_x
+    lda player1_x+1
+    adc #$00
+    sta player1_x+1
+
+    jmp .End
 .End:
     rts
 
