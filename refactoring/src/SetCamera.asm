@@ -93,6 +93,8 @@ SetCamera:
     and #$80
     bne .Neg
 
+    lda #$00
+    sta camera_x+1
     lda camera_x
     and #$F8
     beq .EndLimit
@@ -101,6 +103,8 @@ SetCamera:
     jmp .EndLimit
 
 .Neg:
+    lda #$FF
+    sta camera_x+1
     lda camera_x
     eor #$FF
     and #$F8

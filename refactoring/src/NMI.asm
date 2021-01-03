@@ -26,6 +26,7 @@ NMI:
     lda soft2001
     sta $2001
 
-    dec wait_nmi
+    lda #$00
+    sta wait_nmi
 
     rti

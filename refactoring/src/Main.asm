@@ -61,7 +61,8 @@ MainLoop:
     sta do_dma
 
 WatiNMI:
-    inc wait_nmi
+    lda #$01
+    sta wait_nmi
 .Loop:
     lda wait_nmi
     bne .Loop

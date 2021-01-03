@@ -27,7 +27,9 @@ Move:
     ldy #PAD
     lda [variable_addr], y
     and #PAD_RIGHT
-    beq .NotRight
+    bne .DoRight
+    jmp .NotRight
+.DoRight:
     ; 空中ではマックススピードから
     ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
@@ -61,13 +63,60 @@ Move:
     lda [variable_addr], y
     adc #$00
     sta [variable_addr], y
+    
+    ; リードしていなければ画面外へ移動できなくする
+    lda leadplayer
+    cmp #LEAD_VACANT
+    bne .NotRight
+    lda camera_x+1
+    clc
+    adc #$81
+    sta camera_x+1
+    ldy #PLAYER_X
+    iny
+    lda [variable_addr], y
+    clc
+    adc #$80
+    sta [variable_addr], y
+    
+    lda [variable_addr], y
+    cmp camera_x+1
+    beq .NextRight
+    bcc .NotLimitRight
+    jmp .LimitRight
+.NextRight:
+    dey
+    lda [variable_addr], y
+    cmp camera_x
+    bcc .NotLimitRight
+.LimitRight:
+    ldy #PLAYER_X
+    lda camera_x
+    sta [variable_addr], y
+    iny
+    lda camera_x+1
+    sta [variable_addr], y
+.NotLimitRight:
+    lda camera_x+1
+    sec
+    sbc #$81
+    sta camera_x+1
+    ldy #PLAYER_X
+    iny
+    lda [variable_addr], y
+    sec
+    sbc #$80
+    sta [variable_addr], y
+
 .NotRight:
 
     ; 左
     ldy #PAD
     lda [variable_addr], y
     and #PAD_LEFT
-    beq .NotLeft
+    bne .DoLeft
+    jmp .NotLeft
+.DoLeft:
     ; 空中ではマックススピードから
     ldy #PLAYER_FALL_INDEX
     lda [variable_addr], y
@@ -100,6 +149,50 @@ Move:
     iny
     lda [variable_addr], y
     sbc #$00
+    sta [variable_addr], y
+
+    ; リードしていなければ画面外へ移動できなくする
+    lda leadplayer
+    cmp #LEAD_VACANT
+    bne .NotLeft
+    lda camera_x+1
+    clc
+    adc #$80
+    sta camera_x+1
+    ldy #PLAYER_X
+    iny
+    lda [variable_addr], y
+    clc
+    adc #$80
+    sta [variable_addr], y
+    
+    lda camera_x+1
+    cmp [variable_addr], y
+    beq .NextLeft
+    bcc .NotLimitLeft
+    jmp .LimitLeft
+.NextLeft:
+    lda camera_x
+    dey
+    cmp [variable_addr], y
+    bcc .NotLimitLeft
+.LimitLeft:
+    ldy #PLAYER_X
+    lda camera_x
+    sta [variable_addr], y
+    iny
+    lda camera_x+1
+    sta [variable_addr], y
+.NotLimitLeft:
+    lda camera_x+1
+    sec
+    sbc #$80
+    sta camera_x+1
+    ldy #PLAYER_X
+    iny
+    lda [variable_addr], y
+    sec
+    sbc #$80
     sta [variable_addr], y
 .NotLeft:
 

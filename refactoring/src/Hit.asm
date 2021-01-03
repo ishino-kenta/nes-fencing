@@ -9,7 +9,7 @@ hit_player_y    .rs 1
 hit_sword_x    .rs 2
 hit_sword_y    .rs 1
 
-DEAD_TIME = $F0
+DEAD_TIME = $60
 
 LEAD_VACANT = 0
 LEAD_PLAYER1 = 1

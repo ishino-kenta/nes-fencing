@@ -191,3 +191,12 @@ SceneBattle:
 
     jmp MainLoop
 
+Wait:
+
+    ldx #$00
+.Loop:
+    inx
+    cpx #$FF
+    bne .Loop
+
+    rts
