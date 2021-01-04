@@ -4,8 +4,8 @@
 ; x位置$10ごとに変わっていく．
 ;
 ; 入力
-;  fill_tile_cul
-;   タイルを埋めたいところのx位置．
+;  fill_tile_x
+;   タイルを埋めたいところのx位置の上位．
 ;  stage_base
 ;   ベースのタイル
 
@@ -17,83 +17,102 @@ SIDE_CENTER = 0
 SIDE_RIGHT = 1
 SIDE_LEFT = 2
 
+fill_tile_x_pre   .rs 1
+fill_tile_phase   .rs 3
+fill_tile_x .rs 1
+fill_tile_mask  .rs 1
+
+base_offset .rs 1
 
 
 FillTileBuff:
 
-    ; 位置でページを反転
-    lda fill_tile_cul+1
-    and #$80
-    bne .Side1
-    jmp .Side2
-.Side1:
-    lda fill_tile_cul
-    eor #$FF
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta page_x
-    lda fill_tile_cul+1
-    eor #$FF
-    and #$7F
-    clc
-    adc #$01
-    sta area_page
-    jmp .SideEnd
-.Side2:
-    lda fill_tile_cul
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta page_x
-    lda fill_tile_cul+1
-    and #$7F
-    sta area_page
-.SideEnd:
+    ; 4段階に分けてタイルを埋めていく
+
+    lda fill_tile_x
+    cmp fill_tile_x_pre
+    beq .NextPhase
+    lda #$00
+    sta fill_tile_phase
+.NextPhase:
+
+    lda fill_tile_x
+    sta fill_tile_x_pre
+
+    lda fill_tile_phase
+    asl a
+    tax
+    lda fillTileBuff, x
+    sta fill_tile_phase+1
+    inx
+    lda fillTileBuff, x
+    sta fill_tile_phase+2
+
+    jmp [fill_tile_phase+1]
+
+.EndFill:
+
+    rts
+
+fillTileBuff:
+    .dw FillTileBuffPhase1, FillTileBuffPhase2, FillTileBuffPhase3, FillTileBuffPhase4
+
+FillTileBuffPhase1:
 
 
-    ; 入力から TILE_BUFF の位置を求める．
-    ;  fill_tile_buff = (fill_tile_cul / 8 / 2 * 14) + TILE_BUFF
 
-    lda fill_tile_cul
-    and #$F0
+    ; 埋める場所を計算
+    ; fill_tile_buff = ((fill_tile_x & $03) * $E0) + TILE_BUFF
+    lda #$00
+    sta fill_tile_buff
+    sta fill_tile_buff+1
     sta fill_tile_cul
-    lda fill_tile_cul+1
-    and #$01
+    
+    lda fill_tile_x
+    and #$03
     sta fill_tile_cul+1
 
+    lsr fill_tile_cul+1
+    ror fill_tile_cul
 
-    lsr fill_tile_cul+1
-    ror fill_tile_cul
-    lda fill_tile_cul
-    sta fill_tile_buff
-    lda fill_tile_cul+1
-    sta fill_tile_buff+1
-    lsr fill_tile_cul+1
-    ror fill_tile_cul
-    lda fill_tile_cul
+    lda fill_tile_buff
     clc
-    adc fill_tile_buff
+    adc fill_tile_cul
     sta fill_tile_buff
-    lda fill_tile_cul+1
-    adc fill_tile_buff+1
-    sta fill_tile_buff+1
-    lsr fill_tile_cul+1
-    ror fill_tile_cul
-    lda fill_tile_cul
-    clc
-    adc fill_tile_buff
-    sta fill_tile_buff
-    lda fill_tile_cul+1
-    adc fill_tile_buff+1
-    sta fill_tile_buff+1
-
     lda fill_tile_buff+1
+    adc fill_tile_cul+1
+    sta fill_tile_buff+1
+
+    lsr fill_tile_cul+1
+    ror fill_tile_cul
+
+    lda fill_tile_buff
+    clc
+    adc fill_tile_cul
+    sta fill_tile_buff
+    lda fill_tile_buff+1
+    adc fill_tile_cul+1
+    sta fill_tile_buff+1
+
+    lsr fill_tile_cul+1
+    ror fill_tile_cul
+
+    lda fill_tile_buff
+    clc
+    adc fill_tile_cul
+    sta fill_tile_buff
+    lda fill_tile_buff+1
+    adc fill_tile_cul+1
     clc
     adc #HIGH(TILE_BUFF)
     sta fill_tile_buff+1
+
+    lda #$01
+    sta fill_tile_phase
+
+    rts
+
+FillTileBuffPhase2:
 
     ; ベースで埋める
     ;  (利用するベースタイル) = stage_base * 14
@@ -111,34 +130,104 @@ FillTileBuff:
     asl a
     clc
     adc fill_tile_cul
-    tax
+    sta base_offset
+    clc
+    adc #$0E
+    sta fill_tile_cul
+
+    ldy #$00
+.Looop:
+    ldx base_offset
 .Loop:
     lda baseTile, x
     sta [fill_tile_buff], y
     inx
     iny
-    cpy #$0E
+    cpx fill_tile_cul
     bne .Loop
+    cpy #$70
+    bne .Looop
+
+    lda #$02
+    sta fill_tile_phase
+
+    rts
+
+FillTileBuffPhase3:
+
+    lda base_offset
+    clc
+    adc #$0E
+    sta fill_tile_cul
+
+    ldy #$70
+.Looop:
+    ldx base_offset
+.Loop:
+    lda baseTile, x
+    sta [fill_tile_buff], y
+    inx
+    iny
+    cpx fill_tile_cul
+    bne .Loop
+    cpy #$E0
+    bne .Looop
+
+    lda #$03
+    sta fill_tile_phase
+
+    rts
+
+FillTileBuffPhase4:
+
+    ; ページを計算
+    lda fill_tile_x
+    and #$80
+    bne .Side1
+    jmp .Side2
+.Side1:
+    lda fill_tile_x
+    eor #$FF
+    and #$7F
+    clc
+    adc #$01
+    sta page_num
+    lda #$0F
+    sta fill_tile_mask
+    jmp .SideEnd
+.Side2:
+    lda fill_tile_x
+    and #$7F
+    sta page_num
+    lda #$00
+    sta fill_tile_mask
+.SideEnd:
 
     ; オブジェクトの設置
     
     ldy #$00
     lda [area_pointer], y
-    sta area_offset
-    inc area_offset
+    sta page_offset
+    inc page_offset
 
+    ; 範囲外のページでは終了
+    lda nrof_page
+    cmp page_num
+    bcs .DoSetObject
+    jmp .EndFill
+.DoSetObject:
     ; ページのオフセット設定
     ; オブジェ数の保持
     ldy #$00
 .PageLoop:
-    cpy area_page
+    cpy page_num
     beq .EndPageLoop
     iny
     lda [area_pointer], y
     asl a
     clc
-    adc area_offset
-    sta area_offset
+    adc page_offset
+    sta page_offset
     jmp .PageLoop
 .EndPageLoop:
     iny
@@ -149,7 +238,7 @@ FillTileBuff:
 
 .SetObjLoop:
 
-    ldy area_offset
+    ldy page_offset
     lda [area_pointer], y
     and #$F0
     lsr a
@@ -169,15 +258,17 @@ FillTileBuff:
     jmp [area_command]
 .Return:
 
-    lda area_offset
+    lda page_offset
     clc
     adc #$02
-    sta area_offset
+    sta page_offset
 
     dec nrof_object
     beq .EndSetObjLoop
     jmp .SetObjLoop
 .EndSetObjLoop:
+
+.EndFill:
 
     rts
 
@@ -189,20 +280,35 @@ Command1:
     and #$0F
     sta object
 
+    lda #$00
+    sta fill_tile_cul
+
     iny
     lda [area_pointer], y
     and #$0F
-    cmp page_x
-    bne .SkipSetObj
+    eor fill_tile_mask
+    asl a
+    sta fill_tile_cul
+
+    asl fill_tile_cul
+    clc
+    adc fill_tile_cul
+
+    asl fill_tile_cul
+    clc
+    adc fill_tile_cul
+    sta fill_tile_cul
+
     lda [area_pointer], y
     lsr a
     lsr a
     lsr a
     lsr a
+    clc
+    adc fill_tile_cul
     tay
     lda object
     sta [fill_tile_buff], y
-.SkipSetObj:
 
     rts
 

@@ -2,7 +2,62 @@ set_title_counter   .rs 2
 
 SetTitle:
 
-    ldx draw_buff_counter
+    ; タイル初期化
+    ldx #$00
+    ldy #$00
+.TileInitLoop:
+    lda #$F0
+    sta DRAW_BUFF, x
+    inx
+    lda #INC_1+DATA_ONE
+    sta DRAW_BUFF, x
+    inx
+    lda tileIint, y
+    sta DRAW_BUFF, x
+    inx
+    iny
+    lda tileIint, y
+    sta DRAW_BUFF, x
+    inx
+    iny
+    lda #$00
+    sta DRAW_BUFF, x
+    inx
+
+    cpy #$08
+    bne .TileInitLoop
+
+    lda #$00
+    sta DRAW_BUFF, x
+
+    jsr DrawBG
+
+    ; 属性初期化
+    ldx #$00
+    lda #$40
+    sta DRAW_BUFF, x
+    inx
+    lda #INC_1+DATA_ONE
+    sta DRAW_BUFF, x
+    inx
+    lda #$C0
+    sta DRAW_BUFF, x
+    inx
+    iny
+    lda #$23
+    sta DRAW_BUFF, x
+    inx
+    iny
+    lda #$00
+    sta DRAW_BUFF, x
+    inx
+    lda #$00
+    sta DRAW_BUFF, x
+    jsr DrawBG
+
+    ; タイトル
+
+    ldx #$00
     
     lda #$09
     sta DRAW_BUFF, x
@@ -84,3 +139,6 @@ titleTile:
     .incbin "./res/title_hor.tile"
 pushstartTile:    
     .incbin "./res/pushstart_hor.tile"
+
+tileIint:
+    .dw $2000,$20F0,$21E0,$22D0

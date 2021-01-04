@@ -186,7 +186,7 @@ CollisionDetectionOnce:
     and #$F0
     sta collisiondetection_x
     lda collisiondetection_x+1
-    and #$01 ; 画面2つ分にマスク
+    and #$03 ; 画面4つ分にマスク
     sta collisiondetection_x+1
 
     lsr collisiondetection_x+1

@@ -82,14 +82,15 @@ fill_draw_raw   .rs 1
 
 fill_tile_cul .rs 2
 fill_tile_buff    .rs 2
-area_page    .rs 1 ; エリア数-1であることに注意
+page_num    .rs 1 ; エリア数-1であることに注意
 page_x  .rs 1
 area_command .rs 2
 nrof_object .rs 1
-area_offset .rs 1
+nrof_page .rs 1
+page_offset .rs 1
 object  .rs 1
 
-stage_length    .rs 1
+nrof_area    .rs 1
 stage_base  .rs 1
 stage_pointer  .rs 2
 area_pointer    .rs 2

@@ -82,15 +82,9 @@ WatiNMI:
     .include "./SceneBattle.asm"
     .include "./SceneTitle.asm"
     .include "./SceneStageSelect.asm"
+    .include "./SceneResult.asm"
 
     ; サブルーチン
-    .include "./subroutine/LoadPalette.asm"
-    .include "./subroutine/ReadPad.asm"
-    .include "./subroutine/DrawBG.asm"
-    .include "./SetStage.asm"
-    .include "./FillTileBuff.asm"
-    .include "./DrawTileBuff.asm"
-    .include "./SetArea.asm"
     .include "./SetTitle.asm"
     .include "./DrawPlayer.asm"
     .include "./SetCamera.asm"
@@ -107,6 +101,9 @@ WatiNMI:
     .include "./Pause.asm"
     .include "./Hit.asm"
     .include "./Reborn.asm"
+    .include "./FarAway.asm"
+    .include "./ChangeArea.asm"
+    .include "./SetWin.asm"
 
 
     .bank 1
@@ -116,6 +113,15 @@ WatiNMI:
     .include "./NMI.asm"
     .include "./IRQ.asm"
     .include "./RESET.asm"
+
+    ; サブルーチン
+    .include "./subroutine/LoadPalette.asm"
+    .include "./subroutine/ReadPad.asm"
+    .include "./subroutine/DrawBG.asm"
+    .include "./SetStage.asm"
+    .include "./FillTileBuff.asm"
+    .include "./DrawTileBuff.asm"
+    .include "./SetArea.asm"
 
 palette:
     .incbin "./res/palette.pal"

@@ -162,8 +162,14 @@ SceneBattle:
     jsr Hit
     jsr HitCheck
 
+    ; 離れすぎたら死亡
+    jsr FarAway
+
     ; プレイヤーの向きを計算
     jsr SetPlayerDirection
+
+    ; エリア移動
+    jsr ChangeArea
 
     ; カメラ位置の決定
     jsr SetCamera

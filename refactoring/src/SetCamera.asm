@@ -122,6 +122,27 @@ SetCamera:
     adc camera_x+1
     sta camera_x+1
 
+    ; エリアのページ数でカメラを制限
+    lda camera_x+1
+    and #$80
+    bne .PageLeft
+.PageRight:
+    lda camera_x+1
+    cmp nrof_page
+    bne .EndPage
+    lda #$00
+    sta camera_x
+    jmp .EndPage
+.PageLeft:
+    lda camera_x+1
+    eor #$FF
+    cmp nrof_page
+    bne .EndPage
+    lda #$00
+    sta camera_x
+    inc camera_x+1
+.EndPage:
+
     ; カメラによってメインスクリーン変更
     lda camera_x+1
     and #$01

@@ -39,6 +39,16 @@ Move:
     sta [variable_addr], y
     jmp .EndIterateRight 
 .NotJumpRight:
+    ; しゃがみ中はマックススピードから
+    ldy #PLAYER_CROUCH
+    lda [variable_addr], y
+    cmp #CROUCH
+    bne .NotCrouchRight
+    ldy #PLAYER_SPEED_INDEX
+    lda #SPEED_MAX
+    sta [variable_addr], y
+    jmp .EndIterateRight 
+.NotCrouchRight:
     ; インデックスを進める
     ldy #PLAYER_SPEED_INDEX
     lda [variable_addr], y
@@ -126,6 +136,16 @@ Move:
     sta [variable_addr], y
     jmp .EndIterateLeft 
 .NotJumpLeft:
+    ; しゃがみ中はマックススピードから
+    ldy #PLAYER_CROUCH
+    lda [variable_addr], y
+    cmp #CROUCH
+    bne .NotCrouchLeft
+    ldy #PLAYER_SPEED_INDEX
+    lda #SPEED_MAX
+    sta [variable_addr], y
+    jmp .EndIterateLeft 
+.NotCrouchLeft:
     ; インデックスを進める
     ldy #PLAYER_SPEED_INDEX
     lda [variable_addr], y

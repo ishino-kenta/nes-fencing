@@ -39,6 +39,9 @@ Hit:
     ldy #PLAYER_DEAD
     lda [variable_addr], y
     bne .Not
+    ldy #PLAYER_DEAD
+    lda [variable_addr+2], y
+    bne .Not
     jmp .Do
 .Not:
     jmp .End

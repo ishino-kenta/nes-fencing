@@ -44,7 +44,7 @@ DrawTileBuff:
     and #$F0
     sta fill_draw_cul
     lda fill_draw_cul+1
-    and #$01 ; 画面2つ分にマスク
+    and #$03 ; 画面4つ分にマスク
     sta fill_draw_cul+1
 
     ; TILE_BUFFから持ってくる位置と書き込むPPUの位置の計算
